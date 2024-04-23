@@ -21,12 +21,11 @@ def main_menu(graph_number):
     continue_running = True
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  Afficher le tableau de contraintes")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  Afficher la matrice des valeurs")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  Vérifier les propriétés -> calcul des calendriers")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "4." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "BONUS" + Back.RESET + Fore.RESET + Style.RESET_ALL + " Afficher le graphe")
-        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  Changer la table de contraintes")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  ...")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  ...")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  ...")
+
+        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
 
         if graph_number < 10:
             print("\n╚" + "═" * 23 + Fore.LIGHTWHITE_EX + " Table : " + str(graph_number) + Fore.RESET + " " + "═" * 24 + "╝")
@@ -67,7 +66,6 @@ def main_menu(graph_number):
             graph_number = change_table()  # Récupérer le nouveau numéro de table
             constraints_table = matrice_table(graph_number)  # Lire la nouvelle table de contraintes
             graph_data = store_constraints_in_memory(constraints_table)  # Mettre à jour les données en mémoire
-            graph_data = {key: graph_data[key] for key in sorted(graph_data)}  # Trier
 
         else:
             print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 4.")
@@ -76,65 +74,17 @@ def main_menu(graph_number):
 # Fonction d'exécution du choix de menu
 def execute_choice(choice, graph_data, graph_number):
 
-    # Afficher le tableau de contraintes
     if choice == 1:
-        print(graph_data)
 
-        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Création du graphe d’ordonnancement" + Fore.RESET + " ─────────── ✦")
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
 
-        # Affichage du tableau de contraintes
-        print("\n" + Fore.LIGHTYELLOW_EX + "✦" + Style.RESET_ALL + " Tableau de contraintes :\n")
-        display_constraints_table(graph_data)
-
-        # Affichage sous forme de triplets
-        print("\n\n" + Fore.LIGHTYELLOW_EX + "✦" + Style.RESET_ALL + " Affichage du graphe sous forme de triplets :\n")
-        display_graph_as_triplets(graph_data)
-
-    # Afficher la matrice des valeurs
     elif choice == 2:
 
-        print(Fore.RESET + "\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Matrice des valeurs" + Fore.RESET + " ─────────── ✦\n")
-        display_value_matrix(graph_data)
+        print(Fore.RESET + "\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦\n")
 
-    # Vérifier les propriétés + calcul des calendriers
     elif choice == 3:
 
-        print("\n✦ ─────────── Vérification des propriétés ─────────── ✦\n")
-
-        # Vérification propriétés : arcs positifs + pas de cycles
-        has_negative_arcs, has_cycles = check_properties(graph_data)
-
-        # Si propriétés validées + proposition de calcul des calendriers
-        if not has_negative_arcs and not has_cycles:
-
-            print(Fore.GREEN + "\n✦ Le graphe ne contient ni arc à valeur négative ni cycle.\n✦ " + Back.GREEN + Fore.BLACK + "C'est un graphe d'ordonnancement." + Style.RESET_ALL)
-
-            # Demander si l'utilisateur souhaite calculer les calendriers
-            if prompt_for_calendars():
-
-                print("\n✦ ─────────── Calcul des Calendriers ─────────── ✦\n")
-
-                # Calcul des rangs
-                ranks = calculate_ranks(graph_data)
-
-                # Calcul des dates au plus tôt
-                earliest_schedule = calculate_earliest_schedule(graph_data, ranks)
-                projet_fin = max(earliest_schedule.values())
-
-                # Calcul des dates au plus tard
-                latest_schedule = calculate_latest_schedule(graph_data, ranks, projet_fin)
-
-                # Affichage des calendriers et du chemin critique
-                print_schedule_tables(earliest_schedule, latest_schedule, ranks, graph_data, graph_number)
-
-    # BONUS : Afficher le graphe
-    elif choice == 4:
-
-        if graph_data:
-            draw_graph(graph_data, graph_number)
-
-        else:
-            print("\nImpossible de dessiner le graphe, données non disponibles.\n")
+        print(Fore.RESET + "\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦\n")
 
 
 # Fonction pour changer la table de contraintes
