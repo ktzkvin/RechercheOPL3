@@ -1,9 +1,8 @@
 
-# 🧮 L3 Projet : Théorie des Graphes
+# 🧮 L3 Projet : Recherche Opérationnelle
 
-Projet de Théorie des Graphes de 3ᵉ année à l'EFREI Paris du groupe B3.<br />
-Le projet doit s'exécuter sur une série de 14 tables de test. Afin d'explorer tout le potentiel du programme, nous avons créé la `table 15.txt` comportant des arcs négatifs.
-
+Projet de Recherche Opérationnelle de 3ᵉ année à l'EFREI Paris du groupe B3.<br />
+Le projet doit s'exécuter sur une série de ... tables de test. 
 
 ## 🖊️ Auteurs 
 
@@ -17,17 +16,6 @@ Le projet doit s'exécuter sur une série de 14 tables de test. Afin d'explorer 
 
 ### Prérequis :
 - Python 3.8 ou supérieur
-- Graphviz sur votre machine (pour l'affichage graphique)
-
-Pour installer Graphviz sur votre machine, veuillez suivre les instructions suivantes :<br />
-
-#### Télécharger la version correspondante à votre système d'exploitation :
-- [Windows](https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/10.0.1/windows_10_cmake_Release_graphviz-install-10.0.1-win64.exe.sha256)
-- [Autres systèmes d'exploitation](https://gitlab.com/graphviz/graphviz/-/releases)
-
-Lors de l'installation, veuillez cocher la case "_Add Graphviz to the system PATH for all users_" pour que l'installation soit effective.<br /><br />
-![Installation](https://cdn.discordapp.com/attachments/422113586597593088/1230474163651739648/Screenshot_1_1.png?ex=6633735d&is=6620fe5d&hm=1de86b77a671c6c1191d12f03362da7cfc07d63520c5c1248dee86b2cb630aa5&)
-
 
 ### Installation du projet :
 
@@ -35,12 +23,12 @@ Toutes commandes à suivre sont à exécuter dans le terminal de votre IDE.
 
 #### Clôner le depôt github :
 ```bash
-    git clone https://github.com/ktzkvin/GraphProjectL3.git
+    git clone https://github.com/ktzkvin/RechercheOPL3
 ```
 
-#### Naviguer dans le répertoire `GraphProjectL3` :
+#### Naviguer dans le répertoire `RechercheOPL3` :
 ```bash
-    cd GraphProjectL3
+    cd RechercheOPL3
 ```
 
 #### Installer les dépendances nécessaires :
