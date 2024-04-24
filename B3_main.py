@@ -78,13 +78,10 @@ def execute_choice(choice, graph_data, graph_number):
     if choice == 1:
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
-        try:
-            taille, couts, provisions, commandes = read_file_transport(graph_number)
-            display_matrix(taille, couts, provisions, commandes)
-        except FileNotFoundError:
-            print("Fichier de données non trouvé. Veuillez vérifier la disponibilité du fichier.")
-        except Exception as e:
-            print(f"Une erreur est survenue: {e}")
+        if graph_data:
+            display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_number)
+        else:
+            print("Aucune donnée chargée. Veuillez charger les données.")
 
     elif choice == 2:
 
