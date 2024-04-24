@@ -1,3 +1,4 @@
+from B3_data import *
 from colorama import Fore, Back, Style, init
 
 # Initialiser les couleurs pour le terminal
@@ -17,7 +18,7 @@ def continue_prompt():
 
 
 # Menu principal
-def main_menu(graph_number):
+def main_menu(graph_data, graph_number):
     continue_running = True
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
@@ -44,16 +45,16 @@ def main_menu(graph_number):
             print(Fore.RED + "\n✧" + Fore.RESET + " Programme quitté. " + Fore.RED + "✧\n" + Fore.RESET)
             break
 
+
         # Choix du menu
         elif choice in [1, 2, 3, 4]:
-            # Lire + enregistrer les données de la table de contraintes sous forme de matrice
+            '''# Lire + enregistrer les données de la table de contraintes sous forme de matrice
             constraints_table = matrice_table(graph_number)
 
             # Stockage du tableau de contraintes dans la mémoire
             graph_data = store_constraints_in_memory(constraints_table)  # Stockage du graphe en mémoire
             graph_data = {key: graph_data[key] for key in sorted(graph_data)}  # Trier par ordre de nœud
-
-            # Exécuter le choix de l'utilisateur
+'''
             execute_choice(choice, graph_data, graph_number)
 
             # Ajout de la demande pour continuer ou quitter le programme
@@ -63,9 +64,9 @@ def main_menu(graph_number):
 
         # Changer la table de contraintes
         elif choice == 5:
-            graph_number = change_table()  # Récupérer le nouveau numéro de table
+            '''graph_number = change_table()  # Récupérer le nouveau numéro de table
             constraints_table = matrice_table(graph_number)  # Lire la nouvelle table de contraintes
-            graph_data = store_constraints_in_memory(constraints_table)  # Mettre à jour les données en mémoire
+            graph_data = store_constraints_in_memory(constraints_table)  # Mettre à jour les données en mémoire'''
 
         else:
             print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 4.")
@@ -77,6 +78,13 @@ def execute_choice(choice, graph_data, graph_number):
     if choice == 1:
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
+        try:
+            taille, couts, provisions, commandes = read_file_transport(graph_number)
+            display_matrix(taille, couts, provisions, commandes)
+        except FileNotFoundError:
+            print("Fichier de données non trouvé. Veuillez vérifier la disponibilité du fichier.")
+        except Exception as e:
+            print(f"Une erreur est survenue: {e}")
 
     elif choice == 2:
 
@@ -94,12 +102,12 @@ def change_table():
 
     while True:
         try:
-            new_graph_number = int(input(Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Entrez le nouveau numéro de la table de contraintes " + Fore.YELLOW + "" + Fore.LIGHTBLUE_EX + "(1-15)" + Fore.RESET + " : "))
-            if 1 <= new_graph_number <= 15:
+            new_graph_number = int(input(Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Entrez le nouveau numéro de la table de contraintes " + Fore.YELLOW + "" + Fore.LIGHTBLUE_EX + "(1-12)" + Fore.RESET + " : "))
+            if 1 <= new_graph_number <= 12:
                 print("\nTable de contraintes changée.\n")
                 return new_graph_number
             else:
-                print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 15.\n")
+                print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 12.\n")
         except ValueError:
             print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 4.")
 
@@ -109,15 +117,16 @@ if __name__ == "__main__":
     while True:
         print("\n╔═══════════════════ " + Fore.LIGHTWHITE_EX + "Projet Graphe : B3" + Fore.RESET + " ═══════════════════╗")
         try:
-            graph_number = int(input("\n" + Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Entrez le numéro de la table de contraintes " + Fore.YELLOW + "" + Fore.LIGHTBLUE_EX + "(1-15)" + Fore.RESET + " : "))
-            if 1 <= graph_number <= 15:
-                main_menu(graph_number)
+            graph_number = int(input("\n" + Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Entrez le numéro de la table de contraintes " + Fore.YELLOW + "" + Fore.LIGHTBLUE_EX + "(1-12)" + Fore.RESET + " : "))
+            if 1 <= graph_number <= 12:
+                graph_data = load_graph_data(graph_number)
+                main_menu(graph_data, graph_number)
                 break  # Sortir de la boucle si une entrée valide est fournie
             elif graph_number == 0:
                 print(Fore.RED + "\n✧" + Fore.RESET + " Programme quitté. " + Fore.RED + "✧\n" + Fore.RESET)
                 break  # Sortir de la boucle
             else:
-                print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 15.\n")
+                print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 12.\n")
         except ValueError as e:
             print(Fore.RED + "\n  ⚠" + Fore.RESET + " [ERROR] Détail de l'erreur : " + Fore.RED + str(e) + "\n" + Style.RESET_ALL)
 
