@@ -19,6 +19,7 @@ def continue_prompt():
 
 # Menu principal
 def main_menu(graph_data, graph_number):
+    print(graph_data)
     continue_running = True
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
@@ -64,9 +65,13 @@ def main_menu(graph_data, graph_number):
 
         # Changer la table de contraintes
         elif choice == 5:
-            '''graph_number = change_table()  # Récupérer le nouveau numéro de table
-            constraints_table = matrice_table(graph_number)  # Lire la nouvelle table de contraintes
-            graph_data = store_constraints_in_memory(constraints_table)  # Mettre à jour les données en mémoire'''
+            new_graph_number = change_table()
+            if new_graph_number is not None:
+                graph_number = new_graph_number
+                graph_data = load_graph_data(graph_number)
+                print(Fore.GREEN + f"\nTable {graph_number} chargée avec succès." + Fore.RESET)
+            else:
+                print(Fore.RED + "\nChangement de table annulé." + Fore.RESET)
 
         else:
             print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 4.")
