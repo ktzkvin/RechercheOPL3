@@ -19,7 +19,6 @@ def continue_prompt():
 
 # Menu principal
 def main_menu(graph_data, graph_number):
-    print(graph_data)
     continue_running = True
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
@@ -85,7 +84,8 @@ def execute_choice(choice, graph_data, graph_number):
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
         if graph_data:
             propositions = [25, 0, 0], [10, 15, 0], [0, 5, 20]
-            display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_number, propositions)
+            graph_data['propositions'] = propositions
+            display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'] , graph_number)
         else:
             print("Aucune donnée chargée. Veuillez charger les données.")
 

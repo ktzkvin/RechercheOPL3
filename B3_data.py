@@ -46,7 +46,7 @@ def load_graph_data(graph_number):
         return None
 
 
-def display_matrix(taille, couts, provisions, commandes, graph_number, propositions):
+def display_matrix(taille, couts, provisions, commandes, propositions, graph_number):
     """Affiche les données du problème de transport sous forme de tableau."""
     headers = [Style.BRIGHT + f"C{i + 1}" + Style.RESET_ALL for i in range(taille[1])] + [Back.WHITE + Fore.BLACK + " Provisions " + Style.RESET_ALL]
     headers.insert(0, Fore.LIGHTGREEN_EX + str(graph_number) + Style.RESET_ALL)
