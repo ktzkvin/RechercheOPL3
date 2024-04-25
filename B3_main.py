@@ -84,7 +84,8 @@ def execute_choice(choice, graph_data, graph_number):
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
         if graph_data:
-            display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_number)
+            propositions = [25, 0, 0], [10, 15, 0], [0, 5, 20]
+            display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_number, propositions)
         else:
             print("Aucune donnée chargée. Veuillez charger les données.")
 
