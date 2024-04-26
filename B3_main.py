@@ -83,8 +83,6 @@ def execute_choice(choice, graph_data, graph_number):
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
         if graph_data:
-            propositions = [25, 0, 0], [10, 15, 0], [0, 5, 20]
-            graph_data['propositions'] = propositions
             display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'] , graph_number)
         else:
             print("Aucune donnée chargée. Veuillez charger les données.")
@@ -97,6 +95,12 @@ def execute_choice(choice, graph_data, graph_number):
 
         print(Fore.RESET + "\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦\n")
 
+    elif choice == 4:
+
+        connexe(graph_data)
+
+    elif choice == 5:
+        nord_ouest(graph_data)
 
 # Fonction pour changer la table de contraintes
 def change_table():
@@ -123,6 +127,8 @@ if __name__ == "__main__":
             graph_number = int(input("\n" + Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Entrez le numéro de la table de contraintes " + Fore.YELLOW + "" + Fore.LIGHTBLUE_EX + "(1-12)" + Fore.RESET + " : "))
             if 1 <= graph_number <= 12:
                 graph_data = load_graph_data(graph_number)
+                propositions = [25, 0, 0], [10, 15, 0], [0, 0, 20]
+                graph_data['propositions'] = propositions
                 main_menu(graph_data, graph_number)
                 break  # Sortir de la boucle si une entrée valide est fournie
             elif graph_number == 0:
@@ -132,4 +138,6 @@ if __name__ == "__main__":
                 print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 12.\n")
         except ValueError as e:
             print(Fore.RED + "\n  ⚠" + Fore.RESET + " [ERROR] Détail de l'erreur : " + Fore.RED + str(e) + "\n" + Style.RESET_ALL)
+
+
 
