@@ -1,6 +1,7 @@
 from tabulate import tabulate
 from colorama import Fore, Back, Style, init
 
+
 # Initialiser les couleurs pour le terminal
 init(autoreset=True)
 
@@ -48,6 +49,12 @@ def load_graph_data(graph_number):
 
 def display_matrix(taille, couts, provisions, commandes, propositions, graph_number):
     """Affiche les données du problème de transport sous forme de tableau."""
+    # Calculer la somme des valeurs de provisions
+    somme_provisions = sum(provisions)
+
+    # Ajouter la somme des provisions à la dernière ligne des commandes
+    commandes_row = [Back.WHITE + Fore.BLACK + " Commandes " + Style.RESET_ALL] + [str(commande) for commande in commandes] + [str(somme_provisions)]
+
     headers = [Style.BRIGHT + f"C{i + 1}" + Style.RESET_ALL for i in range(taille[1])] + [Back.WHITE + Fore.BLACK + " Provisions " + Style.RESET_ALL]
     headers.insert(0, Fore.LIGHTGREEN_EX + str(graph_number) + Style.RESET_ALL)
     headers = [str(i) for i in headers]
@@ -63,7 +70,6 @@ def display_matrix(taille, couts, provisions, commandes, propositions, graph_num
         table.append(row)
 
     # Ajouter la ligne des commandes
-    commandes_row = [Back.WHITE + Fore.BLACK + " Commandes " + Style.RESET_ALL] + [str(commande) for commande in commandes]
     table.append(commandes_row)
 
     print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
@@ -76,39 +82,123 @@ def connexe(graph_data):
             for valeur in proposition:
                 if valeur != 0:
                     notzero += 1
-        print("test")
         if notzero+1 == row_column:
-            print('Diagramme connexe')
+            print('Le diagramme est connexe')
+            return False
         else:
-            print('Diagramme non connexe')
-
-        print(trouver_combinaison_minimale(graph_data))
+            print("Le diagramme est non connexe")
+            return True
 
 
 def trouver_combinaison_minimale(graph_data):
-    # Trouver la valeur minimale dans les coûts
-    couts_minimaux = min(min(row) for row in graph_data['couts'])
-    #print(couts_minimaux)
+    # Créer une copie temporaire des coûts
+    couts_temp = [row[:] for row in graph_data['couts']]
 
-    # Parcourir les coûts pour trouver l'indice de la valeur minimale
-    for i, row in enumerate(graph_data['couts']):
+    # Trouver la valeur minimale dans les coûts
+    couts_minimaux = min(min(row) for row in couts_temp)
+
+    # Parcourir les coûts copiés pour trouver l'indice de la valeur minimale
+    for i, row in enumerate(couts_temp):
         for j, cout in enumerate(row):
             if cout == couts_minimaux:
                 indice_minimal_i = i
                 indice_minimal_j = j
                 break
-    #print(indice_minimal_i, indice_minimal_j)
 
     # Vérifier si la proposition associée a une valeur nulle
     if graph_data['propositions'][indice_minimal_i][indice_minimal_j] == 0:
-        print("La combinaison minimale est S{}C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
-
+        graph_data['combinaison_minimale'] = (indice_minimal_i, indice_minimal_j)
+        print("L'arrête à ajouté pour l'obtention d'une proposition non dégénérée est P{}C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
     else:
-        # Mettre à jour les coûts pour exclure la proposition associée
-        graph_data['couts'][indice_minimal_i][indice_minimal_j] = float('inf')
-        #print("La combinaison est pas égale à 0")
-        trouver_combinaison_minimale(graph_data)
+        # Mettre à jour les coûts copiés pour exclure la proposition associée
+        couts_temp[indice_minimal_i][indice_minimal_j] = float('inf')
+        # Appeler récursivement la fonction en utilisant les copies modifiées
+        trouver_combinaison_minimale({'couts': couts_temp, 'propositions': graph_data['propositions']})
+
+def calcul_potentiels(graph_data):
+    # Initialiser E(P1) à 0
+    potentiels = {'P1': 0}
+
+    # Parcourir les coûts et les propositions pour trouver les arêtes avec une proposition non nulle
+    for i, row in enumerate(graph_data['couts']):
+        for j, cout in enumerate(row):
+            proposition = graph_data['propositions'][i][j]
+            if proposition != 0 or (i, j) == graph_data.get('combinaison_minimale', (-1, -1)):
+                Pi = 'P{}'.format(i + 1)
+                Cj = 'C{}'.format(j + 1)
+                if Pi in potentiels and Cj not in potentiels:
+                    # Mettre à jour E(Cj) si Pi est connu et Cj est inconnu
+                    potentiels[Cj] = potentiels[Pi] - cout
+                    print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                elif Cj in potentiels and Pi not in potentiels:
+                    # Stocker temporairement le calcul pour une utilisation ultérieure
+                    potentiels[Pi] = cout + potentiels[Cj]
+                    print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+
+    while len(potentiels) < len(graph_data['couts']) + len(graph_data['propositions']):
+        # Créer une variable pour suivre si des mises à jour ont été effectuées
+        updated = False
+
+        # Parcourir les coûts et les propositions pour mettre à jour les potentiels
+        for i, row in enumerate(graph_data['couts']):
+            for j, cout in enumerate(row):
+                proposition = graph_data['propositions'][i][j]
+                if proposition != 0 or (i, j) == graph_data.get('combinaison_minimale', (-1, -1)):
+                    Pi = 'P{}'.format(i + 1)
+                    Cj = 'C{}'.format(j + 1)
+                    if Pi not in potentiels and Cj in potentiels:
+                        potentiels[Pi] = cout + potentiels[Cj]
+                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                        updated = True
+                    elif Cj not in potentiels and Pi in potentiels:
+                        potentiels[Cj] = cout - potentiels[Pi]
+                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                        updated = True
+
+        # Vérifier si des mises à jour ont été effectuées, sinon sortir de la boucle
+        if not updated:
+            break
+
+    print('\nRésultats :')
+    # Afficher les résultats
+    for key, value in potentiels.items():
+        print("E({}) = {}".format(key, value))
 
 
 def nord_ouest(graph_data):
-    d=1
+    # Récupérer les dimensions du tableau
+    n = len(graph_data['provisions'])
+    m = len(graph_data['commandes'])
+
+    # Créer des copies des listes de provisions et de commandes
+    provisions_copie = graph_data['provisions'][:]
+    commandes_copie = graph_data['commandes'][:]
+
+    # Initialiser la matrice d'allocation avec des zéros
+    allocation = [[0 for _ in range(m)] for _ in range(n)]
+
+    # Indices pour parcourir les lignes et les colonnes
+    i = 0
+    j = 0
+
+    # Tant qu'il reste des fournisseurs et des clients à servir
+    while i < n and j < m:
+        # Allouer autant que possible en partant du coin nord-ouest
+        quantity = min(provisions_copie[i], commandes_copie[j])
+        allocation[i][j] = quantity
+
+        # Mettre à jour les provisions et les commandes restantes dans les copies
+        provisions_copie[i] -= quantity
+        commandes_copie[j] -= quantity
+
+        # Passer au fournisseur suivant s'il n'a plus de provision
+        if provisions_copie[i] == 0:
+            i += 1
+
+        # Passer au client suivant s'il n'a plus de commande
+        if commandes_copie[j] == 0:
+            j += 1
+
+    return allocation
+
+
