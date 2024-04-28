@@ -107,16 +107,65 @@ def trouver_combinaison_minimale(graph_data):
 
     # Vérifier si la proposition associée a une valeur nulle
     if graph_data['propositions'][indice_minimal_i][indice_minimal_j] == 0:
-        graph_data['combinaison_minimale'] = (indice_minimal_i, indice_minimal_j)
+        combinaison_minimale = (indice_minimal_i, indice_minimal_j)
         print("L'arrête à ajouté pour l'obtention d'une proposition non dégénérée est P{}C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
+
     else:
         # Mettre à jour les coûts copiés pour exclure la proposition associée
         couts_temp[indice_minimal_i][indice_minimal_j] = float('inf')
         # Appeler récursivement la fonction en utilisant les copies modifiées
-        trouver_combinaison_minimale({'couts': couts_temp, 'propositions': graph_data['propositions']})
+        combinaison_minimale = trouver_combinaison_minimale({'couts': couts_temp, 'propositions': graph_data['propositions']})
+
+    return combinaison_minimale
+
+def calcul_potentiels_not_connexe(graph_data):
+    # Initialiser les potentiels
+    potentiels = {'P1': 0}
+
+    # Trouver la combinaison minimale
+    combinaison_minimale = trouver_combinaison_minimale(graph_data)
+
+    # Créer une copie de graph_data
+    graph_data_copy = graph_data.copy()
+
+    print('\nCalculs potentiels par sommets :')
+
+    # Modifier la copie pour prendre en compte la nouvelle proposition
+    if combinaison_minimale:
+        i, j = combinaison_minimale
+        graph_data_copy['propositions'][i][j] = -1  # Initialiser la valeur à -1
+
+    # Répéter les calculs jusqu'à la convergence
+    while len(potentiels) < graph_data['taille'][0] + graph_data['taille'][1]:
+        updated = False  # Variable pour suivre si des mises à jour ont été effectuées
+
+        # Parcourir les propositions de la copie pour mettre à jour les potentiels
+        for i, row in enumerate(graph_data_copy['couts']):
+            for j, cout in enumerate(row):
+                proposition = graph_data_copy['propositions'][i][j]
+                if proposition != 0 or (i, j) == combinaison_minimale:
+                    Pi = 'P{}'.format(i + 1)
+                    Cj = 'C{}'.format(j + 1)
+                    if Pi not in potentiels and Cj in potentiels:
+                        potentiels[Pi] = cout + potentiels[Cj]
+                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                        updated = True
+                    elif Cj not in potentiels and Pi in potentiels:
+                        potentiels[Cj] = potentiels[Pi] - cout
+                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                        updated = True
+
+        # Vérifier si des mises à jour ont été effectuées, sinon sortir de la boucle
+        if not updated:
+            break
+
+    # Afficher les résultats
+    print('\nRésultats des potentiels :')
+    for key, value in potentiels.items():
+        print("E({}) = {}".format(key, value))
 
 def calcul_potentiels(graph_data):
-    # Initialiser E(P1) à 0
+    # Initialiser les potentiels
     potentiels = {'P1': 0}
 
     # Parcourir les coûts et les propositions pour trouver les arêtes avec une proposition non nulle
@@ -135,32 +184,8 @@ def calcul_potentiels(graph_data):
                     potentiels[Pi] = cout + potentiels[Cj]
                     print("E({}) - E({}) = {}".format(Pi, Cj, cout))
 
-    while len(potentiels) < len(graph_data['couts']) + len(graph_data['propositions']):
-        # Créer une variable pour suivre si des mises à jour ont été effectuées
-        updated = False
-
-        # Parcourir les coûts et les propositions pour mettre à jour les potentiels
-        for i, row in enumerate(graph_data['couts']):
-            for j, cout in enumerate(row):
-                proposition = graph_data['propositions'][i][j]
-                if proposition != 0 or (i, j) == graph_data.get('combinaison_minimale', (-1, -1)):
-                    Pi = 'P{}'.format(i + 1)
-                    Cj = 'C{}'.format(j + 1)
-                    if Pi not in potentiels and Cj in potentiels:
-                        potentiels[Pi] = cout + potentiels[Cj]
-                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
-                        updated = True
-                    elif Cj not in potentiels and Pi in potentiels:
-                        potentiels[Cj] = cout - potentiels[Pi]
-                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
-                        updated = True
-
-        # Vérifier si des mises à jour ont été effectuées, sinon sortir de la boucle
-        if not updated:
-            break
-
-    print('\nRésultats :')
     # Afficher les résultats
+    print('\nRésultats des potentiels :')
     for key, value in potentiels.items():
         print("E({}) = {}".format(key, value))
 

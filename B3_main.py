@@ -116,9 +116,11 @@ def execute_choice(choice, graph_data, graph_number):
         display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
         # Vérifier si le diagramme est non connexe
         if connexe(graph_data):
-            trouver_combinaison_minimale(graph_data)
-        print('\nCalculs potentiels par sommets :')
-        calcul_potentiels(graph_data)
+            calcul_potentiels_not_connexe(graph_data)
+
+        else:
+            print('\nCalculs potentiels par sommets :')
+            calcul_potentiels(graph_data)
 
     elif choice == 4:
         print('ok')
