@@ -1,4 +1,5 @@
 from B3_data import *
+from B3_draw import *
 from colorama import Fore, Back, Style, init
 
 # Initialiser les couleurs pour le terminal
@@ -22,11 +23,12 @@ def main_menu(graph_data, graph_number):
     continue_running = True
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage de l'algorithme")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " ... ")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage des potentiels ")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  ...")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  ...")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  ...")
 
-        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
+        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + "  Changer le table de contraintes")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
 
         if graph_number < 10:
             print("\n╚" + "═" * 23 + Fore.LIGHTWHITE_EX + " Table : " + str(graph_number) + Fore.RESET + " " + "═" * 24 + "╝")
@@ -80,50 +82,28 @@ def main_menu(graph_data, graph_number):
 def execute_choice(choice, graph_data, graph_number):
 
     if choice == 1:
+
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
-
-        # Demander à l'utilisateur de choisir l'algorithme
-        print("Choisissez l'algorithme à utiliser :")
-        print("1. Algorithme de Nord-Ouest")
-        print("2. Algorithme de Balas-Hammer")
-        algo_choice = input("")
-
-        if algo_choice == "1":
-            if graph_data:
-                graph_data['propositions'] = nord_ouest(graph_data)
-                display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
-            else:
-                print("Aucune donnée chargée. Veuillez charger les données.")
-        elif algo_choice == "2":
-            # Insérer le code pour l'algorithme de Balas-Hammer ici
-            pass  # Temporairement laissé vide
+        if graph_data:
+            display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'] , graph_number)
         else:
-            print("Choix invalide. Veuillez entrer 1 ou 2 pour sélectionner l'algorithme.")
-
+            print("Aucune donnée chargée. Veuillez charger les données.")
 
     elif choice == 2:
-        # Vérifier si le diagramme est non connexe
-        if connexe(graph_data):
-            trouver_combinaison_minimale(graph_data)
 
-        print('\nPotentiels par sommets :')
-        calcul_potentiels(graph_data)
+        print(Fore.RESET + "\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦\n")
+        draw_transport_graph(graph_data)
 
     elif choice == 3:
 
-        graph_data['propositions'] = nord_ouest(graph_data)
-        print('Voici la méthode du coin Nord-Ouest :')
-        display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
-        # Vérifier si le diagramme est non connexe
-        if connexe(graph_data):
-            trouver_combinaison_minimale(graph_data)
-        print('\nCalculs potentiels par sommets :')
-        calcul_potentiels(graph_data)
+        print(Fore.RESET + "\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Vérification Connexe" + Fore.RESET + " ─────────── ✦\n")
+        connexe(graph_data)
+
 
     elif choice == 4:
-        print('ok')
 
-
+        print(Fore.RESET + "\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Méthode Nord-Ouest" + Fore.RESET + " ─────────── ✦\n")
+        nord_ouest(graph_data)
 
 
 # Fonction pour changer la table de contraintes
@@ -151,13 +131,8 @@ if __name__ == "__main__":
             graph_number = int(input("\n" + Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Entrez le numéro de la table de contraintes " + Fore.YELLOW + "" + Fore.LIGHTBLUE_EX + "(1-12)" + Fore.RESET + " : "))
             if 1 <= graph_number <= 12:
                 graph_data = load_graph_data(graph_number)
-
-                # Initialiser propositions avec des zéros en fonction de graph_data['taille']
-                propositions = [[0] * graph_data['taille'][1] for _ in range(graph_data['taille'][0])]
-
-                # Assigner propositions à graph_data['propositions']
+                propositions = [25, 0, 0], [10, 15, 0], [0, 0, 20]
                 graph_data['propositions'] = propositions
-
                 main_menu(graph_data, graph_number)
                 break  # Sortir de la boucle si une entrée valide est fournie
             elif graph_number == 0:

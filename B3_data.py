@@ -115,6 +115,7 @@ def trouver_combinaison_minimale(graph_data):
         # Appeler récursivement la fonction en utilisant les copies modifiées
         trouver_combinaison_minimale({'couts': couts_temp, 'propositions': graph_data['propositions']})
 
+
 def calcul_potentiels(graph_data):
     # Initialiser E(P1) à 0
     potentiels = {'P1': 0}
