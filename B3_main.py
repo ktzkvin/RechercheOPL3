@@ -1,5 +1,6 @@
 from B3_data import *
 from B3_draw import *
+from B3_transport_methods import *
 from colorama import Fore, Back, Style, init
 
 # Initialiser les couleurs pour le terminal
@@ -89,23 +90,23 @@ def execute_choice(choice, graph_data, graph_number):
         print("2. Algorithme de Balas-Hammer")
         algo_choice = input("")
 
+        # Méthode de Nord-Ouest
         if algo_choice == "1":
-            if graph_data:
-                graph_data['propositions'] = nord_ouest(graph_data)
-                display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
-            else:
-                print("Aucune donnée chargée. Veuillez charger les données.")
+            graph_data['propositions'] = nord_ouest(graph_data)
+
+        # Méthode de Balas-Hammer
         elif algo_choice == "2":
-            # Insérer le code pour l'algorithme de Balas-Hammer ici
-            pass  # Temporairement laissé vide
+            graph_data['propositions'] = balas_hammer_method(graph_data)
+
         else:
             print("Choix invalide. Veuillez entrer 1 ou 2 pour sélectionner l'algorithme.")
 
+        display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
 
     elif choice == 2:
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
 
-        draw_transport_graph(graph_data)
+        draw_transport_graph(graph_data, graph_number)
 
     elif choice == 3:
 

@@ -47,12 +47,9 @@ def load_graph_data(graph_number):
         return None
 
 
-def display_matrix(taille, couts, provisions, commandes, propositions, graph_number):
+def display_matrix(taille, couts, provisions, commandes, propositions, graph_number, penalites=None):
     """Affiche les données du problème de transport sous forme de tableau."""
-    # Calculer la somme des valeurs de provisions
     somme_provisions = sum(provisions)
-
-    # Ajouter la somme des provisions à la dernière ligne des commandes
     commandes_row = [Back.WHITE + Fore.BLACK + " Commandes " + Style.RESET_ALL] + [str(commande) for commande in commandes] + [str(somme_provisions)]
 
     headers = [Style.BRIGHT + f"C{i + 1}" + Style.RESET_ALL for i in range(taille[1])] + [Back.WHITE + Fore.BLACK + " Provisions " + Style.RESET_ALL]
@@ -60,17 +57,17 @@ def display_matrix(taille, couts, provisions, commandes, propositions, graph_num
     headers = [str(i) for i in headers]
     table = []
 
-    # Ajouter les lignes des fournisseurs avec les coûts et les provisions
     for i in range(taille[0]):
         row = [Style.BRIGHT + f"P{i + 1}" + Style.RESET_ALL] + [Fore.LIGHTBLUE_EX + str(cout) + Style.RESET_ALL + " | " for cout in couts[i]]
         for j in range(taille[1]):
             row[j + 1] += Fore.LIGHTWHITE_EX + str(propositions[i][j]) + Style.RESET_ALL
-
         row.append(str(provisions[i]) + Style.RESET_ALL)
         table.append(row)
-
-    # Ajouter la ligne des commandes
     table.append(commandes_row)
+
+    if penalites:
+        penalites_row = [Back.WHITE + Fore.BLACK + " Pénalités " + Style.RESET_ALL] + [str(p) for p in penalites]
+        table.append(penalites_row)
 
     print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
 
