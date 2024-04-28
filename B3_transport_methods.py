@@ -6,7 +6,7 @@ def balas_hammer_method(graph_data):
     # Initialisation
     provisions = graph_data['provisions'].copy()
     commandes = graph_data['commandes'].copy()
-    costs = copy.deepcopy(graph_data['costs'])  # Copie des coûts pour éviter les modifications sur graph_data
+    costs = copy.deepcopy(graph_data['couts'])  # Copie des coûts pour éviter les modifications sur graph_data
     taille = graph_data['taille']
     fournisseurs, clients = taille
 
