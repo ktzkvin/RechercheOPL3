@@ -1,4 +1,5 @@
 from B3_data import *
+from B3_draw import *
 from colorama import Fore, Back, Style, init
 
 # Initialiser les couleurs pour le terminal
@@ -23,7 +24,7 @@ def main_menu(graph_data, graph_number):
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage de l'algorithme")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " ... ")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage des potentiels ")
 
         print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
@@ -102,12 +103,9 @@ def execute_choice(choice, graph_data, graph_number):
 
 
     elif choice == 2:
-        # Vérifier si le diagramme est non connexe
-        if connexe(graph_data):
-            trouver_combinaison_minimale(graph_data)
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
 
-        print('\nPotentiels par sommets :')
-        calcul_potentiels(graph_data)
+        draw_transport_graph(graph_data)
 
     elif choice == 3:
 
