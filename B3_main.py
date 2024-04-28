@@ -114,11 +114,17 @@ def execute_choice(choice, graph_data, graph_number):
         graph_data['propositions'] = nord_ouest(graph_data)
         print('Voici la méthode du coin Nord-Ouest :')
         display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
+        resultat_connexe = connexe(graph_data)
         # Vérifier si le diagramme est non connexe
-        if connexe(graph_data):
+        if resultat_connexe == 1:
             trouver_combinaison_minimale(graph_data)
-        print('\nCalculs potentiels par sommets :')
-        calcul_potentiels(graph_data)
+            print('\nCalculs potentiels par sommets :')
+            calcul_potentiels_not_connexe(graph_data)
+        elif resultat_connexe == 0:
+            print('\nCalculs potentiels par sommets :')
+            calcul_potentiels(graph_data)
+        elif resultat_connexe == 2:
+            print('\nCalculer les arrêtes')
 
     elif choice == 4:
         print('ok')

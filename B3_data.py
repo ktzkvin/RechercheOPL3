@@ -74,20 +74,24 @@ def display_matrix(taille, couts, provisions, commandes, propositions, graph_num
 
     print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
 
-def connexe(graph_data):
-        row_column=graph_data['taille'][0] + graph_data['taille'][1]
 
-        notzero = 0
-        for proposition in graph_data['propositions']:
-            for valeur in proposition:
-                if valeur != 0:
-                    notzero += 1
-        if notzero+1 == row_column:
-            print('Le diagramme est connexe')
-            return False
-        else:
-            print("Le diagramme est non connexe")
-            return True
+def connexe(graph_data):
+    row_column = graph_data['taille'][0] + graph_data['taille'][1]
+
+    notzero = 0
+    for proposition in graph_data['propositions']:
+        for valeur in proposition:
+            if valeur != 0:
+                notzero += 1
+    if notzero + 1 == row_column:
+        print('Le diagramme est connexe')
+        return 0
+    elif notzero + 2 == row_column:
+        print("Le diagramme est non connexe")
+        return 1
+    else:
+        print("Le diagramme est non connexe et doit trouver plusieurs arrêtes")
+        return 2
 
 
 def trouver_combinaison_minimale(graph_data):
