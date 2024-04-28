@@ -164,6 +164,7 @@ def calcul_potentiels_not_connexe(graph_data):
     for key, value in potentiels.items():
         print("E({}) = {}".format(key, value))
 
+
 def calcul_potentiels(graph_data):
     # Initialiser les potentiels
     potentiels = {'P1': 0}
