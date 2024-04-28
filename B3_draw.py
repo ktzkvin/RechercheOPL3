@@ -1,6 +1,6 @@
 from graphviz import Digraph
 
-def draw_transport_graph(graph_data):
+def draw_transport_graph(graph_data, graph_number):
     dot = Digraph()
     dot.attr(rankdir='LR', size='8,5')
     dot.node_attr.update(shape='circle', style='filled')
@@ -22,4 +22,4 @@ def draw_transport_graph(graph_data):
                 label = f'<{proposition} <FONT COLOR="blue">({cost})</FONT>>'
                 dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor='black')
 
-    dot.render('transport_graph', view=True)
+    dot.render(f'data/graph/transport_graph_{graph_number}', format='pdf', view=True)
