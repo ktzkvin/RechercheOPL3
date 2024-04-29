@@ -92,7 +92,7 @@ def execute_choice(choice, graph_data, graph_number):
 
         # Méthode de Nord-Ouest
         if algo_choice == "1":
-            graph_data['propositions'] = nord_ouest(graph_data)
+            graph_data['propositions'] = nord_ouest_method(graph_data)
 
         # Méthode de Balas-Hammer
         elif algo_choice == "2":
@@ -110,25 +110,25 @@ def execute_choice(choice, graph_data, graph_number):
 
     elif choice == 3:
 
-        graph_data['propositions'] = nord_ouest(graph_data)
+        graph_data['propositions'] = nord_ouest_method(graph_data)
         print('Voici la méthode du coin Nord-Ouest :')
         display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
-        resultat_connexe = connexe(graph_data)
-        # Vérifier si le diagramme est non connexe
-        if resultat_connexe == 1:
-            trouver_combinaison_minimale(graph_data)
-            print('\nCalculs potentiels par sommets :')
-            calcul_potentiels_not_connexe(graph_data)
-        elif resultat_connexe == 0:
-            print('\nCalculs potentiels par sommets :')
-            calcul_potentiels(graph_data)
-        elif resultat_connexe == 2:
-            print('\nCalculer les arrêtes')
+
+        if bfs_connexity(graph_data):
+            print("\nLe réseau de transport est connexe.")
+        else:
+            print("\nLe réseau de transport n'est pas connexe.")
+
+        # Should return False if there's a cycle, True if acyclic
+        # return True  # Aucun cycle trouvé
+        trouver_combinaison_minimale(graph_data)
+        if is_acyclic(graph_data):
+            print("\nLe réseau de transport est acyclique.")
+        else:
+            print("\nLe réseau de transport contient un cycle.")
 
     elif choice == 4:
         print('ok')
-
-
 
 
 # Fonction pour changer la table de contraintes

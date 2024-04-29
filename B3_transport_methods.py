@@ -1,4 +1,42 @@
 import copy
+from collections import deque
+
+
+def nord_ouest_method(graph_data):
+    # Récupérer les dimensions du tableau
+    n = len(graph_data['provisions'])
+    m = len(graph_data['commandes'])
+
+    # Créer des copies des listes de provisions et de commandes
+    provisions_copie = graph_data['provisions'][:]
+    commandes_copie = graph_data['commandes'][:]
+
+    # Initialiser la matrice d'allocation avec des zéros
+    allocation = [[0 for _ in range(m)] for _ in range(n)]
+
+    # Indices pour parcourir les lignes et les colonnes
+    i = 0
+    j = 0
+
+    # Tant qu'il reste des fournisseurs et des clients à servir
+    while i < n and j < m:
+        # Allouer autant que possible en partant du coin nord-ouest
+        quantity = min(provisions_copie[i], commandes_copie[j])
+        allocation[i][j] = quantity
+
+        # Mettre à jour les provisions et les commandes restantes dans les copies
+        provisions_copie[i] -= quantity
+        commandes_copie[j] -= quantity
+
+        # Passer au fournisseur suivant s'il n'a plus de provision
+        if provisions_copie[i] == 0:
+            i += 1
+
+        # Passer au client suivant s'il n'a plus de commande
+        if commandes_copie[j] == 0:
+            j += 1
+
+    return allocation
 
 
 def balas_hammer_method(graph_data):
@@ -12,6 +50,7 @@ def balas_hammer_method(graph_data):
 
     # Tableau initial de toutes les attributions à zéro
     propositions = [[0 for _ in range(clients)] for _ in range(fournisseurs)]
+
 
     while sum(provisions) > 0 and sum(commandes) > 0:
         
@@ -65,3 +104,78 @@ def balas_hammer_method(graph_data):
         costs[i][j] = float('inf')
 
     return propositions
+
+
+def bfs_connexity(graph_data):
+    # Initialisation : extraire les dimensions du graphe
+    num_fournisseurs, num_clients = graph_data['taille']
+
+    # Total de sommets (fournisseurs + clients)
+    total_vertices = num_fournisseurs + num_clients
+    visited = [False] * total_vertices  # Initialiser tous les sommets comme non visités
+    queue = deque([0])  # Commencer par le premier fournisseur
+
+    # Parcours en largeur (BFS) pour trouver les connexions
+    while queue:
+        vertex = queue.popleft()  # Extraire le sommet de la file
+        if not visited[vertex]:  # Si le sommet n'a pas été visité
+            visited[vertex] = True  # Marquer le sommet comme visité
+
+            # Ajouter les sommets adjacents à la file :
+            if vertex < num_fournisseurs:  # Ce sommet est un fournisseur
+
+                # Parcourir les propositions pour trouver les clients connectés
+                for j in range(num_clients):
+                    # Si proposition de la cellule > 0 et le client n'a pas été visité
+                    if graph_data['propositions'][vertex][j] > 0 and not visited[num_fournisseurs + j]:
+                        queue.append(num_fournisseurs + j)  # Ajouter le client à la file
+
+            else:  # Ce sommet est un client
+                client_index = vertex - num_fournisseurs  # Indice du client dans les propositions
+                for i in range(num_fournisseurs):
+                    # Si proposition de la cellule > 0 et le fournisseur n'a pas été visité
+                    if graph_data['propositions'][i][client_index] > 0 and not visited[i]:
+                        queue.append(i)  # Ajouter le fournisseur à la file
+
+    return all(visited)  # Le graphe est connexe si tous les sommets ont été visités
+
+
+def is_acyclic(graph_data):
+    # Initialisation : extraire les dimensions du graphe
+    num_fournisseurs, num_clients = graph_data['taille']
+
+    # Créer une copie des propositions pour éviter les modifications sur graph_data
+    propositions = copy.deepcopy(graph_data['propositions'])
+
+    # Vérifier si le graphe est acyclique
+    for i in range(num_fournisseurs):
+        for j in range(num_clients):
+            if propositions[i][j] > 0:
+                if not dfs_cycle_check(propositions, i, j):
+                    return False  # Il y a un cycle dans le graphe
+
+    return True  # Aucun cycle trouvé
+
+
+def dfs_cycle_check(propositions, i, j, visited=None, stack=None):
+    # Initialisation des listes visited et stack
+    if visited is None:
+        visited = []
+    if stack is None:
+        stack = []
+
+    visited.append((i, j))  # Marquer le sommet actuel comme visité
+    stack.append((i, j))  # Ajouter le sommet actuel à la pile
+
+    # Parcourir les voisins du sommet actuel
+    for neighbor_i in range(len(propositions)):
+        for neighbor_j in range(len(propositions[0])):
+            if propositions[neighbor_i][neighbor_j] > 0:
+                if (neighbor_i, neighbor_j) not in visited:
+                    if dfs_cycle_check(propositions, neighbor_i, neighbor_j, visited, stack):
+                        return True  # Cycle trouvé
+                elif (neighbor_i, neighbor_j) in stack:
+                    return True  # Cycle trouvé
+
+    stack.pop()  # Retirer le sommet actuel de la pile
+    return False  # Aucun cycle trouvé

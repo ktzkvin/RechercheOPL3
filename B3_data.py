@@ -72,25 +72,6 @@ def display_matrix(taille, couts, provisions, commandes, propositions, graph_num
     print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
 
 
-def connexe(graph_data):
-    row_column = graph_data['taille'][0] + graph_data['taille'][1]
-
-    notzero = 0
-    for proposition in graph_data['propositions']:
-        for valeur in proposition:
-            if valeur != 0:
-                notzero += 1
-    if notzero + 1 == row_column:
-        print('Le diagramme est connexe')
-        return 0
-    elif notzero + 2 == row_column:
-        print("Le diagramme est non connexe")
-        return 1
-    else:
-        print("Le diagramme est non connexe et doit trouver plusieurs arrêtes")
-        return 2
-
-
 def trouver_combinaison_minimale(graph_data):
     # Créer une copie temporaire des coûts
     couts_temp = [row[:] for row in graph_data['couts']]
@@ -191,41 +172,5 @@ def calcul_potentiels(graph_data):
     for key, value in potentiels.items():
         print("E({}) = {}".format(key, value))
 
-
-def nord_ouest(graph_data):
-    # Récupérer les dimensions du tableau
-    n = len(graph_data['provisions'])
-    m = len(graph_data['commandes'])
-
-    # Créer des copies des listes de provisions et de commandes
-    provisions_copie = graph_data['provisions'][:]
-    commandes_copie = graph_data['commandes'][:]
-
-    # Initialiser la matrice d'allocation avec des zéros
-    allocation = [[0 for _ in range(m)] for _ in range(n)]
-
-    # Indices pour parcourir les lignes et les colonnes
-    i = 0
-    j = 0
-
-    # Tant qu'il reste des fournisseurs et des clients à servir
-    while i < n and j < m:
-        # Allouer autant que possible en partant du coin nord-ouest
-        quantity = min(provisions_copie[i], commandes_copie[j])
-        allocation[i][j] = quantity
-
-        # Mettre à jour les provisions et les commandes restantes dans les copies
-        provisions_copie[i] -= quantity
-        commandes_copie[j] -= quantity
-
-        # Passer au fournisseur suivant s'il n'a plus de provision
-        if provisions_copie[i] == 0:
-            i += 1
-
-        # Passer au client suivant s'il n'a plus de commande
-        if commandes_copie[j] == 0:
-            j += 1
-
-    return allocation
 
 
