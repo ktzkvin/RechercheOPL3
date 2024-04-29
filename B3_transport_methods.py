@@ -140,42 +140,43 @@ def bfs_connexity(graph_data):
     return all(visited)  # Le graphe est connexe si tous les sommets ont été visités
 
 
-def is_acyclic(graph_data):
-    # Initialisation : extraire les dimensions du graphe
+def is_acyclic_bfs(graph_data):
     num_fournisseurs, num_clients = graph_data['taille']
+    total_vertices = num_fournisseurs + num_clients
+    visited = [False] * total_vertices
+    parent = [-1] * total_vertices
+    queue = deque()
 
-    # Créer une copie des propositions pour éviter les modifications sur graph_data
-    propositions = copy.deepcopy(graph_data['propositions'])
+    # Envisagez chaque fournisseur et chaque client comme un point de départ potentiel
+    for start in range(total_vertices):
+        if not visited[start]:
+            queue.append(start)
+            visited[start] = True
 
-    # Vérifier si le graphe est acyclique
-    for i in range(num_fournisseurs):
-        for j in range(num_clients):
-            if propositions[i][j] > 0:
-                if not dfs_cycle_check(propositions, i, j):
-                    return False  # Il y a un cycle dans le graphe
+            while queue:
+                current = queue.popleft()
 
-    return True  # Aucun cycle trouvé
+                # Déterminer les voisins en fonction du type de sommet
+                if current < num_fournisseurs:  # Sommet actuel est un fournisseur
+                    for j in range(num_clients):
+                        neighbor = num_fournisseurs + j
+                        if graph_data['propositions'][current][j] > 0:
+                            if visited[neighbor] and parent[current] != neighbor:
+                                return False  # Un cycle a été trouvé
+                            if not visited[neighbor]:
+                                visited[neighbor] = True
+                                parent[neighbor] = current
+                                queue.append(neighbor)
+                else:  # Sommet actuel est un client
+                    client_index = current - num_fournisseurs
+                    for i in range(num_fournisseurs):
+                        neighbor = i
+                        if graph_data['propositions'][i][client_index] > 0:
+                            if visited[neighbor] and parent[current] != neighbor:
+                                return False  # Un cycle a été trouvé
+                            if not visited[neighbor]:
+                                visited[neighbor] = True
+                                parent[neighbor] = current
+                                queue.append(neighbor)
 
-
-def dfs_cycle_check(propositions, i, j, visited=None, stack=None):
-    # Initialisation des listes visited et stack
-    if visited is None:
-        visited = []
-    if stack is None:
-        stack = []
-
-    visited.append((i, j))  # Marquer le sommet actuel comme visité
-    stack.append((i, j))  # Ajouter le sommet actuel à la pile
-
-    # Parcourir les voisins du sommet actuel
-    for neighbor_i in range(len(propositions)):
-        for neighbor_j in range(len(propositions[0])):
-            if propositions[neighbor_i][neighbor_j] > 0:
-                if (neighbor_i, neighbor_j) not in visited:
-                    if dfs_cycle_check(propositions, neighbor_i, neighbor_j, visited, stack):
-                        return True  # Cycle trouvé
-                elif (neighbor_i, neighbor_j) in stack:
-                    return True  # Cycle trouvé
-
-    stack.pop()  # Retirer le sommet actuel de la pile
-    return False  # Aucun cycle trouvé
+    return True  # Aucun cycle détecté

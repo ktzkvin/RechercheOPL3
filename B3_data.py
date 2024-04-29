@@ -90,7 +90,7 @@ def trouver_combinaison_minimale(graph_data):
     # Vérifier si la proposition associée a une valeur nulle
     if graph_data['propositions'][indice_minimal_i][indice_minimal_j] == 0:
         combinaison_minimale = (indice_minimal_i, indice_minimal_j)
-        print("L'arrête à ajouté pour l'obtention d'une proposition non dégénérée est P{}C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
+        print("L'arrête à ajouter pour l'obtention d'une proposition non dégénérée est P{}C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
 
     else:
         # Mettre à jour les coûts copiés pour exclure la proposition associée
