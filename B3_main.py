@@ -122,7 +122,21 @@ def execute_choice(choice, graph_data, graph_number):
         # Should return False if there's a cycle, True if acyclic
         # return True  # Aucun cycle trouvé
 
+
         trouver_combinaison_minimale(graph_data)
+        """ adjust_transport_table()
+        
+    return {
+        "taille": graph_data['taille'],
+        "couts": couts,
+        "provisions": provisions,
+        "commandes": commandes,
+        "propositions": graph_data['propositions'],
+        "combinaison_minimale": combinaison_minimale
+    }
+    """
+
+
         if is_acyclic_bfs(graph_data):
             print("\nLe réseau de transport est acyclique.")
         else:

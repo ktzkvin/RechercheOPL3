@@ -91,6 +91,8 @@ def trouver_combinaison_minimale(graph_data):
     if graph_data['propositions'][indice_minimal_i][indice_minimal_j] == 0:
         combinaison_minimale = (indice_minimal_i, indice_minimal_j)
         print("L'arrête à ajouter pour l'obtention d'une proposition non dégénérée est P{}C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
+        # retourner indice_minimal_i, indice_minimal_j
+        return combinaison_minimale, indice_minimal_i, indice_minimal_j
 
     else:
         # Mettre à jour les coûts copiés pour exclure la proposition associée
@@ -98,7 +100,46 @@ def trouver_combinaison_minimale(graph_data):
         # Appeler récursivement la fonction en utilisant les copies modifiées
         combinaison_minimale = trouver_combinaison_minimale({'couts': couts_temp, 'propositions': graph_data['propositions']})
 
-    return combinaison_minimale
+        return combinaison_minimale
+
+# trouver_combinaison_minimale nous donne l'arête à ajouter pour obtenir une proposition non dégénérée si elle existe
+# Fonction adjust_transport_table pour juster la table de transport : quand on doit ajouter une arête dans une cellule ligne/colonne, il faut lui donner une  delta (qui était avant à 0 car l'arête n'existait pas), il faut donc mettre à jour les autres cellules adjacentes en donnant ou en retirant delta
+def adjust_transport_table(graph_data, combinaison_minimale):
+    # Copie des données du graphe
+    couts = [row[:] for row in graph_data['couts']]
+    provisions = graph_data['provisions'][:]
+    commandes = graph_data['commandes'][:]
+
+    # Récupérer les indices de l'arête à ajouter
+    i, j = combinaison_minimale
+
+    # Trouver la valeur de l'arête à ajouter
+    delta = min(provisions[i], commandes[j])
+
+    # Mettre à jour les provisions et les commandes
+    provisions[i] -= delta
+    commandes[j] -= delta
+
+    # Mettre à jour les coûts pour refléter l'ajout de l'arête
+    couts[i][j] = delta
+
+    # Mettre à jour les coûts pour les cellules adjacentes
+    for k in range(len(provisions)):
+        if k != i:
+            couts[k][j] += delta
+    for k in range(len(commandes)):
+        if k != j:
+            couts[i][k] += delta
+
+    return {
+        "taille": graph_data['taille'],
+        "couts": couts,
+        "provisions": provisions,
+        "commandes": commandes,
+        "propositions": graph_data['propositions'],
+        "combinaison_minimale": combinaison_minimale
+    }
+
 
 def calcul_potentiels_not_connexe(graph_data):
     # Initialiser les potentiels
