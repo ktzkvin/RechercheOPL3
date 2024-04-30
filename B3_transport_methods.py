@@ -334,3 +334,34 @@ def detect_cycle_with_edge(graph_data, edge):
         # Si un chemin existe, l'ajout de cette arête créerait un cycle
         return True
     return False
+
+
+def calcul_couts_potentiels(table, dict_items):
+    taille = table['taille']
+    tableau = [[0] * taille[1] for _ in range(taille[0])]
+
+    for value in dict_items.values():
+        # print(key, value)
+        for i in range(taille[0]):
+            for j in range(taille[1]):
+                tableau[i][j] = dict_items['P' + str(i + 1)] - dict_items['C' + str(j + 1)]
+                print(i, j)
+
+    return tableau
+
+
+def calcul_couts_marginaux(graph_data, couts_potentiels):
+    """
+    Calculer les coûts marginaux pour chaque cellule du tableau.
+    :param table: Dictionnaire contenant les données du problème de transport
+    :param couts_potentiels:
+    :return:
+    """
+    taille = graph_data['taille']
+    tableau = [[0] * taille[1] for _ in range(taille[0])]
+
+    for i in range(taille[0]):
+        for j in range(taille[1]):
+            tableau[i][j] = graph_data['couts'][i][j] - couts_potentiels[i][j]
+
+    return tableau

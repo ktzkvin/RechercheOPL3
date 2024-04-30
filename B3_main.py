@@ -93,11 +93,11 @@ def execute_choice(choice, graph_data, graph_number):
         algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
 
         # Méthode de Nord-Ouest
-        if algo_choice == "1":
+        if algo_choice == 1:
             graph_data['propositions'] = nord_ouest_method(graph_data)
 
         # Méthode de Balas-Hammer
-        elif algo_choice == "2":
+        elif algo_choice == 2:
             graph_data['propositions'] = balas_hammer_method(graph_data)
 
         else:
@@ -155,6 +155,7 @@ def execute_choice(choice, graph_data, graph_number):
                     break
                 i, j = combinaison_minimale
                 if not detect_cycle_with_edge(graph_data, (i, j)):
+                    save = (i, j)
                     graph_data['propositions'][i][j] += 1
                     added_edges.append((i, j))
                     print(f"L'arrête P{i + 1}-C{j + 1} a été ajoutée pour améliorer la connexité.")
@@ -164,7 +165,7 @@ def execute_choice(choice, graph_data, graph_number):
 
             print("\nLe réseau de transport est maintenant connexe.")
 
-        draw_transport_graph(graph_data, graph_number, added_edges)
+        draw_transport_graph(graph_data, graph_number, added_edges, save)
 
 
     elif choice == 4:

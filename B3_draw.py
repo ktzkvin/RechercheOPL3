@@ -1,7 +1,8 @@
 from graphviz import Digraph
 
+
 # Fonction pour dessiner le graphe de transport
-def draw_transport_graph(graph_data, graph_number, added_edges=None):
+def draw_transport_graph(graph_data, graph_number, added_edges=None, save=None):
     """
     Dessiner le graphe de transport avec les propositions de transport
     :param graph_data: informations sur le graphe
@@ -28,16 +29,23 @@ def draw_transport_graph(graph_data, graph_number, added_edges=None):
     for i, row in enumerate(graph_data['couts']):
         for j, cost in enumerate(row):
             proposition = graph_data["propositions"][i][j]
-            if proposition > 0:  # Vérifier si la proposition est non nulle
+            # Vérifier si la proposition est non nulle
+            if proposition > 0:
                 # Utilisation de HTML pour la couleur du texte
+
+                # Si l'arête est une des arêtes ajoutées et added_edges n'est pas None, mettre sa proposition à 0
+                if added_edges and (i, j) in added_edges:
+                    proposition = 0
+
                 label = f'<{proposition} <FONT COLOR="blue">({cost})</FONT>>'
                 edge_color = 'black'
+
                 # Si l'arête est une des arêtes ajoutées et added_edges n'est pas None, la colorier en rouge
                 if added_edges and (i, j) in added_edges:
                     edge_color = 'red'
-                    is_connex = "non dégénéré"
+                    is_connex = "- Non Dégénéré"
 
-                dot.attr(label=f"Graphe {graph_number} {is_connex}", fontsize='20')
+                dot.attr(label=f"Graphe {graph_number}{is_connex}", fontsize='20')
                 dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor=edge_color, color=edge_color, dir="none")
 
     dot.render(f'data/graph/transport_graph_{graph_number}', format='pdf', view=True)
