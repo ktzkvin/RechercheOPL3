@@ -75,48 +75,6 @@ def display_matrix(taille, couts, provisions, commandes, propositions, graph_num
     print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
 
 
-def trouver_aretes_minimales_manquantes(graph_data):
-    # Calculer le nombre d'arêtes minimales à trouver
-    row_column = graph_data['taille'][0] + graph_data['taille'][1]
-    notzero = 0
-    for proposition in graph_data['propositions']:
-        for valeur in proposition:
-            if valeur != 0:
-                notzero += 1
-
-    aretes_a_trouver = row_column - notzero -1
-
-    # Créer une copie temporaire des coûts
-    couts_temp = [row[:] for row in graph_data['couts']]
-
-    # Trouver la valeur minimale dans les coûts
-    couts_minimaux = min(min(row) for row in couts_temp if row)
-
-    # Initialiser une liste pour stocker les arêtes minimales manquantes
-    aretes_manquantes = []
-
-    # Parcourir les coûts copiés pour trouver toutes les arêtes minimales manquantes
-    while len(aretes_manquantes) < aretes_a_trouver:
-        for i, row in enumerate(couts_temp):
-            for j, cout in enumerate(row):
-                if cout == couts_minimaux and graph_data['propositions'][i][j] == 0:
-                    aretes_manquantes.append((i, j))
-                    # Vérifier si le nombre d'arêtes minimales trouvées atteint le nombre requis
-                    if len(aretes_manquantes) == aretes_a_trouver:
-                        # Imprimer les arêtes manquantes
-                        for arete in aretes_manquantes:
-                            print("P{}C{} ".format(arete[0] + 1, arete[1] + 1))
-                        return aretes_manquantes  # Retourner les arêtes trouvées
-
-        # Augmenter le cout minimal pour trouver la prochaine arête minimale
-        couts_minimaux += 1
-
-    # Imprimer les arêtes manquantes
-    for arete in aretes_manquantes:
-        print("P{}C{} ".format(arete[0] + 1, arete[1] + 1))
-    return aretes_manquantes  # Retourner toutes les arêtes minimales trouvées
-
-
 def connexe(graph_data):
     row_column = graph_data['taille'][0] + graph_data['taille'][1]
 
@@ -204,36 +162,6 @@ def calcul_potentiels_not_connexe(graph_data):
         # Vérifier si des mises à jour ont été effectuées, sinon sortir de la boucle
         if not updated:
             break
-
-    # Afficher les résultats
-    print('\nRésultats des potentiels :')
-    for key, value in potentiels.items():
-        print("E({}) = {}".format(key, value))
-
-def calcul_potentiels_not_connexe_2(graph_data):
-    # Initialiser les potentiels
-    potentiels = {'P1': 0}
-
-    # Trouver les arêtes minimales manquantes
-    aretes_manquantes = trouver_aretes_minimales_manquantes(graph_data)
-
-    print('\nCalculs potentiels par sommets :')
-
-    # Parcourir les coûts et les arêtes minimales manquantes pour trouver les potentiels
-    for i, row in enumerate(graph_data['couts']):
-        for j, cout in enumerate(row):
-            proposition = graph_data['propositions'][i][j]
-            if proposition != 0 or (i, j) in aretes_manquantes:
-                Pi = 'P{}'.format(i + 1)
-                Cj = 'C{}'.format(j + 1)
-                if Pi in potentiels and Cj not in potentiels:
-                    # Mettre à jour E(Cj) si Pi est connu et Cj est inconnu
-                    potentiels[Cj] = potentiels[Pi] - cout
-                    print("E({}) - E({}) = {}".format(Pi, Cj, cout))
-                elif Cj in potentiels and Pi not in potentiels:
-                    # Stocker temporairement le calcul pour une utilisation ultérieure
-                    potentiels[Pi] = cout + potentiels[Cj]
-                    print("E({}) - E({}) = {}".format(Pi, Cj, cout))
 
     # Afficher les résultats
     print('\nRésultats des potentiels :')

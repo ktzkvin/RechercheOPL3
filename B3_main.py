@@ -117,13 +117,14 @@ def execute_choice(choice, graph_data, graph_number):
         resultat_connexe = connexe(graph_data)
         # Vérifier si le diagramme est non connexe
         if resultat_connexe == 1:
+            trouver_combinaison_minimale(graph_data)
+            print('\nCalculs potentiels par sommets :')
             calcul_potentiels_not_connexe(graph_data)
         elif resultat_connexe == 0:
             print('\nCalculs potentiels par sommets :')
             calcul_potentiels(graph_data)
         elif resultat_connexe == 2:
-            trouver_aretes_minimales_manquantes(graph_data)
-            calcul_potentiels_not_connexe_2(graph_data)
+            print('\nCalculer les arrêtes')
 
     elif choice == 4:
         print('ok')
