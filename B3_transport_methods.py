@@ -1,5 +1,6 @@
 from copy import deepcopy
 from collections import deque
+from colorama import Back, Fore, Style
 
 
 # Fonction pour appliquer la méthode de Nord-Ouest
@@ -65,9 +66,7 @@ def balas_hammer_method(graph_data):
 
     while sum(provisions) > 0 and sum(commandes) > 0:
 
-        # Calcul des pénalités...
-
-        # ...pour chaque ligne
+        # Calcul des pénalités pour chaque ligne
         delta_rows = []
         for row in costs:
             valid_costs = [cost for cost in row if cost != float('inf')]  # Coûts valides (non infinis)
@@ -76,7 +75,7 @@ def balas_hammer_method(graph_data):
             else:
                 delta_rows.append(-float('inf'))
 
-        # ...pour chaque colonne
+        # Calcul des pénalités pour chaque colonne
         delta_cols = []
         for j in range(clients):
             valid_costs = [costs[i][j] for i in range(fournisseurs) if costs[i][j] != float('inf')]  # Coûts valides (non infinis)
@@ -445,6 +444,7 @@ def cout_totaux(graph_data):
     # Obtenir le nombre de fournisseurs (rows) et de clients (columns)
     num_fournisseurs, num_clients = graph_data['taille']
 
+    print()
     # Itérer sur chaque cellule de propositions
     for i in range(num_fournisseurs):
         for j in range(num_clients):
@@ -452,7 +452,12 @@ def cout_totaux(graph_data):
                 cost = graph_data['couts'][i][j]
                 proposition = graph_data['propositions'][i][j]
                 total_cost += cost * proposition  # Multiplier le coût par la proposition et ajouter au coût total
+                print(f"Coût de transport de {Fore.LIGHTBLUE_EX}P{i+1}{Style.RESET_ALL} à {Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} : "
+                      f"{Fore.LIGHTWHITE_EX}{cost}{Style.RESET_ALL} x {Fore.LIGHTWHITE_EX}{proposition}{Style.RESET_ALL} = "
+                      f"{Fore.LIGHTWHITE_EX}{cost * proposition}{Style.RESET_ALL}")
 
-    print(f'Coup total : {total_cost}' )
+
+    print()
+    print( "Coûts totaux : " + Back.LIGHTBLUE_EX + Fore.BLACK + f' {total_cost} ' + Style.RESET_ALL)
 
     return total_cost
