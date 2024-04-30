@@ -107,25 +107,36 @@ def execute_choice(choice, graph_data, graph_number):
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
 
         draw_transport_graph(graph_data, graph_number)
-
     elif choice == 3:
-
+        # Appliquer l'algorithme du coin Nord-Ouest pour initialiser les propositions
         graph_data['propositions'] = nord_ouest_method(graph_data)
         print('Voici la méthode du coin Nord-Ouest :')
-        display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
+        display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'],
+                       graph_data['propositions'], graph_number)
 
+        # Vérifier la connexité du réseau
         if bfs_connexity(graph_data):
-            print("\nLe réseau de transport est connexe.")
+            print("\nLe réseau de transport est déjà connexe.")
         else:
             print("\nLe réseau de transport n'est pas connexe.")
-            combinaison_minimale = trouver_combinaison_minimale(graph_data)
-            draw_transport_graph(graph_data, graph_number, combinaison_minimale)
+            # Identifier les sous-graphes connexes
+            components = find_connected_components(graph_data)
+            # Dessiner les sous-graphes connexes identifiés
+            draw_transport_graph_with_components(graph_data, graph_number, components)
 
-            if detect_cycle_with_edge(graph_data, combinaison_minimale):
-                print("Le réseau de transport est cyclique.")
-            else:
-                print("Le réseau de transport est acyclique.")
+            # Tant que le réseau n'est pas connexe, ajouter les arêtes nécessaires
+            added_edges = []
+            while not bfs_connexity(graph_data):
+                combinaison_minimale = trouver_combinaison_minimale(graph_data)
+                # Ajouter l'arête minimale trouvée
+                i, j = combinaison_minimale
+                graph_data['propositions'][i][j] += 1
+                added_edges.append((i, j))
+                print(f"Ajout de l'arête P{i + 1}C{j + 1} pour améliorer la connexité.")
 
+            print("\nLe réseau de transport est maintenant connexe.")
+            # Dessiner le graphe final avec toutes les arêtes ajoutées pour rendre le réseau connexe
+            draw_transport_graph(graph_data, graph_number, added_edges)
     elif choice == 4:
         print('ok')
 

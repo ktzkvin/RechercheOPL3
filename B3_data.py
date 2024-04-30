@@ -1,3 +1,4 @@
+from B3_transport_methods import *
 from tabulate import tabulate
 from colorama import Fore, Back, Style, init
 
@@ -112,7 +113,7 @@ def trouver_combinaison_minimale(graph_data):
     # Vérifier si la proposition associée a une valeur nulle
     if graph_data['propositions'][indice_minimal_i][indice_minimal_j] == 0:
         combinaison_minimale = (indice_minimal_i, indice_minimal_j)
-        print("L'arrête à ajouter pour l'obtention d'une proposition non dégénérée est P{}C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
+        print("L'arrête à ajouter pour l'obtention d'une proposition non dégénérée est P{}-C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
 
     else:
         # Mettre à jour les coûts copiés pour exclure la proposition associée
@@ -236,3 +237,17 @@ def nord_ouest(graph_data):
     return allocation
 
 
+def rendre_graphe_connexe(graph_data):
+    # Assurez-vous que toutes les propositions sont initialisées
+    if graph_data['propositions'] is None:
+        graph_data['propositions'] = [[0] * graph_data['taille'][1] for _ in range(graph_data['taille'][0])]
+
+    while not bfs_connexity(graph_data):
+        # Trouver une arête minimale à ajouter qui n'introduit pas de cycle
+        combinaison_minimale = trouver_combinaison_minimale(graph_data)
+        i, j = combinaison_minimale
+        # Ajouter cette arête au graphe
+        graph_data['propositions'][i][j] += 1  # Supposez que vous ajoutez la capacité minimale, généralement 1
+        print(f"Ajout de l'arête P{i + 1}C{j + 1} pour améliorer la connexité.")
+
+    print("Le graphe est maintenant connexe.")

@@ -234,5 +234,37 @@ def detect_cycle_with_edge(graph_data, edge):
         return True
     return False
 
+from collections import deque
 
+def find_connected_components(graph_data):
+    num_fournisseurs, num_clients = graph_data['taille']
+    total_vertices = num_fournisseurs + num_clients
+    visited = [False] * total_vertices
+    components = []
 
+    def bfs(start_vertex):
+        queue = deque([start_vertex])
+        component = []
+        visited[start_vertex] = True
+        while queue:
+            vertex = queue.popleft()
+            component.append(vertex)
+            # Déterminer les connexions en fonction de si c'est un fournisseur ou un client
+            if vertex < num_fournisseurs:
+                for j in range(num_clients):
+                    if graph_data['propositions'][vertex][j] > 0 and not visited[num_fournisseurs + j]:
+                        visited[num_fournisseurs + j] = True
+                        queue.append(num_fournisseurs + j)
+            else:  # C'est un client
+                client_index = vertex - num_fournisseurs
+                for i in range(num_fournisseurs):
+                    if graph_data['propositions'][i][client_index] > 0 and not visited[i]:
+                        visited[i] = True
+                        queue.append(i)
+        return component
+
+    for v in range(total_vertices):
+        if not visited[v]:
+            components.append(bfs(v))
+
+    return components
