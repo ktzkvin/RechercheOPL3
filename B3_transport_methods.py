@@ -156,41 +156,59 @@ def bfs_connexity(graph_data):
 
     return all(visited)  # Le graphe est connexe si tous les sommets ont été visités
 
-
+def vertex_to_label(index, num_providers):
+    if index < num_providers:
+        return f'P{index + 1}'
+    else:
+        return f'C{index - num_providers + 1}'
 # Fonction pour vérifier si un chemin existe entre deux sommets dans le graphe
 def path_exists(graph_data, start, end, visited):
     """
-    Vérifie s'il existe un chemin entre deux sommets dans le graphe.
+    Vérifie s'il existe un chemin entre deux sommets dans le graphe et retourne ce chemin s'il existe.
     :param graph_data: Dictionnaire contenant les données du graphe
     :param start: Sommet de départ
     :param end: Sommet d'arrivée
     :param visited: Liste des sommets visités
-    :return: True si un chemin existe, False sinon
+    :return: Tuple (bool, list) - (True si un chemin existe, False sinon, chemin suivi si existant)
     """
-    # Parcours en largeur (BFS) pour trouver s'il existe un chemin de start à end
+    # Utiliser une file pour le parcours en largeur (BFS)
+    #retourner un tuple (bool, list) - (True si un chemin existe, False sinon, chemin suivi si existant)
+    # le chemin est une liste [] nommée path qui contiendrait les sommets visités, par exemple path = [9, 14, 10, 7...]
+
     queue = deque([start])
+    # Dictionnaire pour garder une trace des prédécesseurs de chaque sommet
+    predecessors = {start: None}
     visited[start] = True
+
     while queue:
-        current = queue.popleft()
-        if current == end:
-            return True  # Chemin trouvé
-        # Parcourir les propositions pour trouver les sommets adjacents
-        if current < len(graph_data['propositions']):  #
-            for j in range(len(graph_data['propositions'][current])):
-                if graph_data['propositions'][current][j] > 0:
-                    neighbor = j + len(graph_data['propositions'])  # Indice du client
-                    if not visited[neighbor]:
-                        visited[neighbor] = True
-                        queue.append(neighbor)
-        else:  # C'est un client
-            client_index = current - len(graph_data['propositions'])
-            # Parcourir les propositions pour trouver les sommets adjacents
-            for i in range(len(graph_data['propositions'])):
-                if graph_data['propositions'][i][client_index] > 0:
-                    if not visited[i]:
-                        visited[i] = True
-                        queue.append(i)
-    return False  # Pas de chemin trouvé
+        vertex = queue.popleft()
+        if vertex == end:
+            # Reconstruire le chemin à partir de la fin en utilisant les prédécesseurs
+            path = []
+            step = vertex
+            while step is not None:
+                path.append(vertex_to_label(step, graph_data['taille'][0]))
+                step = predecessors[step]
+            path.reverse()  # Le chemin est construit à l'envers, donc on le retourne
+            return True, path
+
+        # Explorer les voisins
+        if vertex < graph_data['taille'][0]:  # Fournisseurs
+            for j in range(graph_data['taille'][1]):
+                neighbor = graph_data['taille'][0] + j
+                if graph_data['propositions'][vertex][j] > 0 and not visited[neighbor]:
+                    visited[neighbor] = True
+                    queue.append(neighbor)
+                    predecessors[neighbor] = vertex
+        else:  # Clients
+            client_index = vertex - graph_data['taille'][0]
+            for i in range(graph_data['taille'][0]):
+                if graph_data['propositions'][i][client_index] > 0 and not visited[i]:
+                    visited[i] = True
+                    queue.append(i)
+                    predecessors[i] = vertex
+
+    return False, []
 
 
 # Fonction pour trouver les composants connexes du graphe
@@ -288,7 +306,6 @@ def calcul_potentiels_not_connexe(graph_data):
 
 
 def calcul_potentiels(graph_data):
-    print(graph_data)
     # Initialiser les potentiels
     potentiels = {'P1': 0}
 
@@ -313,7 +330,7 @@ def calcul_potentiels(graph_data):
     for key, value in potentiels.items():
         print("E({}) = {}".format(key, value))
 
-    return potentiels.items()
+    return potentiels
 
 
 def trouver_combinaison_minimale(graph_data, ignore_set):
@@ -360,7 +377,14 @@ def rendre_graphe_connexe(graph_data):
     print("Le graphe est maintenant connexe.")
 
 
+# Fonction pour détecter un cycle dans le graphe
 def detect_cycle_with_edge(graph_data, edge):
+    """
+    Vérifie si l'ajout d'une arête créerait un cycle dans le graphe.
+    :param graph_data: Dictionnaire contenant les données du graphe
+    :param edge: Sommets de l'arête à vérifier
+    :return: True si un cycle est créé, False sinon
+    """
     # Initialisation
     total_vertices = sum(graph_data['taille'])
     visited = [False] * total_vertices
@@ -368,25 +392,28 @@ def detect_cycle_with_edge(graph_data, edge):
     # Convertir l'arête dans les index de la liste visited
     edge_indices = (edge[0], edge[1] + graph_data['taille'][0])
 
-    # Vérifiez si un chemin existe déjà entre les deux sommets de l'arête améliorante
-    if path_exists(graph_data, edge_indices[0], edge_indices[1], visited):
+    # Vérifier si un chemin existe déjà entre les deux sommets de l'arête améliorante
+    valid, path = path_exists(graph_data, edge_indices[0], edge_indices[1], visited)
+    if valid:
         # Si un chemin existe, l'ajout de cette arête créerait un cycle
-        return True
-    return False
+        return True, path
+    return False, path
 
 
-def calcul_couts_potentiels(table, dict_items):
-    taille = table['taille']
+def calcul_couts_potentiels(graph_data, dict_items):
+    taille = graph_data['taille']
     tableau = [[0] * taille[1] for _ in range(taille[0])]
 
-    for value in dict_items.values():
-        # print(key, value)
-        for i in range(taille[0]):
-            for j in range(taille[1]):
-                tableau[i][j] = dict_items['P' + str(i + 1)] - dict_items['C' + str(j + 1)]
-                print(i, j)
+    for i in range(taille[0]):
+        for j in range(taille[1]):
+            p_key = 'P' + str(i + 1)
+            c_key = 'C' + str(j + 1)
+            p_value = dict_items.get(p_key, 0)
+            c_value = dict_items.get(c_key, 0)
+            tableau[i][j] = p_value - c_value
 
     return tableau
+
 
 
 def calcul_couts_marginaux(graph_data, couts_potentiels):
@@ -403,6 +430,7 @@ def calcul_couts_marginaux(graph_data, couts_potentiels):
         for j in range(taille[1]):
             tableau[i][j] = graph_data['couts'][i][j] - couts_potentiels[i][j]
 
+    #print tableau
     return tableau
 
 
@@ -426,3 +454,5 @@ def cout_totaux(graph_data):
                 total_cost += cost * proposition  # Multiplier le coût par la proposition et ajouter au coût total
 
     print(f'Coup total : {total_cost}' )
+
+    return total_cost

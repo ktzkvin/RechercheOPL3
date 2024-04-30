@@ -123,3 +123,24 @@ def display_matrix_cost_only(taille, couts, provisions, commandes, graph_number)
     table.append(commandes_row)
 
     print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
+
+
+def display_matrix_2d(tableau, graph_number, type_tab):
+    """
+    Affiche les coûts et les potentiels sous forme de tableau.
+    :param tableau: Tableau contenant les coûts et les potentiels
+    :return: None
+    """
+
+    headers = [Style.BRIGHT + f"C{i + 1}" + Style.RESET_ALL for i in range(len(tableau[0]))]
+    headers.insert(0, Fore.LIGHTGREEN_EX + str(graph_number) + Style.RESET_ALL)
+    headers = [str(i) for i in headers]
+    table = []
+
+    for i in range(len(tableau)):
+        row = [Style.BRIGHT + f"P{i + 1}" + Style.RESET_ALL] + [Fore.LIGHTBLUE_EX + str(cout) + Style.RESET_ALL for cout in tableau[i]]
+        table.append(row)
+
+    print(f"\n Table des coûts {type_tab}:")
+    print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
+

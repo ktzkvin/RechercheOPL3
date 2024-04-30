@@ -7,6 +7,73 @@ from colorama import Fore, Back, Style, init
 init(autoreset=True)
 
 
+def connexity(graph_data, graph_number):
+    print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Connexité du graphe" + Fore.RESET + " ─────────── ✦")
+
+    # Demander à l'utilisateur de choisir l'algorithme
+    print("\nChoisissez l'algorithme à utiliser :")
+    print("1. Algorithme de " + Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
+    print("2. Algorithme de " + Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
+    print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
+    algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
+    method = ""
+
+    # Méthode de Nord-Ouest
+    if algo_choice == 1:
+        graph_data['propositions'] = nord_ouest_method(graph_data)
+        method = "Nord-Ouest"
+
+    # Méthode de Balas-Hammer
+    elif algo_choice == 2:
+        graph_data['propositions'] = balas_hammer_method(graph_data)
+        method = "Balas-Hammer"
+
+    print(
+        "\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + f"Affichage des potentiels avec {method}" + Fore.RESET + " ─────────── ✦")
+
+    display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'],
+                             graph_data['commandes'],
+                             graph_data['propositions'], graph_number)
+
+    added_edges = []
+    ignored_edges = set()
+    save = None
+
+    if bfs_connexity(graph_data):
+        print("\nLe réseau de transport est déjà connexe.")
+    else:
+        print("\nLe réseau de transport n'est pas connexe.")
+
+        # Identifier et afficher les sous-graphes connexes
+        components = find_connected_components(graph_data)
+        draw_transport_graph_with_components(graph_data, graph_number, components)
+
+        # Trouver les arêtes minimales pour rendre le graphe connexe
+        while not bfs_connexity(graph_data):
+            combinaison_minimale = trouver_combinaison_minimale(graph_data, ignored_edges)
+            if combinaison_minimale is None:
+                print("Aucune autre arête ne peut être ajoutée sans créer de cycle.")
+                break
+            i, j = combinaison_minimale
+
+            is_cycle, path = detect_cycle_with_edge(graph_data, (i, j))
+            if not is_cycle:
+                save = (i, j)
+                graph_data['propositions'][i][j] += 1
+                added_edges.append((i, j))
+                print(f"L'arrête P{i + 1}-C{j + 1} a été ajoutée pour améliorer la connexité.")
+
+            else:
+                # Associer chaque tuple de path à un sommet
+                print(f"Impossible d'ajouter l'arête P{i + 1}-C{j + 1} car cela créerait un cycle : {path}")
+                ignored_edges.add((i, j))
+
+        print("\nLe réseau de transport est maintenant connexe.")
+    if save and (i, j) in save:
+        graph_data['propositions'][save[0]][save[1]] = 0
+    draw_transport_graph(graph_data, graph_number, added_edges, save)
+
+
 # Fonction pour mettre en pause (demande pour continuer ou non)
 def continue_prompt():
     while True:  # Boucle jusqu'à ce que l'utilisateur donne une réponse valide
@@ -28,8 +95,8 @@ def main_menu(graph_data, graph_number):
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Proposition de transport (NO/BH)")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Connexité du graphe")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "4." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Calcul des coûts potentiels")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Coûts Totaux")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "6." + Back.RESET + Fore.RESET + Style.RESET_ALL + " ...")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Calcul des coûts marginaux")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "6." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Coûts Totaux")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "7." + Back.RESET + Fore.RESET + Style.RESET_ALL + " ...")
 
 
@@ -47,7 +114,7 @@ def main_menu(graph_data, graph_number):
             print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
             choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
         except ValueError:
-            print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 4.")
+            print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 9.")
             continue
 
         # Quitter le programme
@@ -57,7 +124,7 @@ def main_menu(graph_data, graph_number):
 
 
         # Choix du menu
-        elif choice in [1, 2, 3, 4, 6, 7, 8]:
+        elif choice in [1, 2, 3, 4, 5, 6, 7, 8]:
 
             execute_choice(choice, graph_data, graph_number)
 
@@ -77,7 +144,7 @@ def main_menu(graph_data, graph_number):
                 print(Fore.RED + "\nChangement de table annulé." + Fore.RESET)
 
         else:
-            print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 4.")
+            print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 9.")
 
 
 # Fonction d'exécution du choix de menu
@@ -113,77 +180,38 @@ def execute_choice(choice, graph_data, graph_number):
         display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
 
     elif choice == 3:
-        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Connexité du graphe" + Fore.RESET + " ─────────── ✦")
-
-        # Demander à l'utilisateur de choisir l'algorithme
-        print("\nChoisissez l'algorithme à utiliser :")
-        print("1. Algorithme de "+ Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
-        print("2. Algorithme de "+ Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
-        print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
-        algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
-        method = ""
-
-        # Méthode de Nord-Ouest
-        if algo_choice == 1:
-            graph_data['propositions'] = nord_ouest_method(graph_data)
-            method = "Nord-Ouest"
-
-        # Méthode de Balas-Hammer
-        elif algo_choice == 2:
-            graph_data['propositions'] = balas_hammer_method(graph_data)
-            method = "Balas-Hammer"
-
-        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + f"Affichage des potentiels avec {method}" + Fore.RESET + " ─────────── ✦")
-
-        display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'],
-                                 graph_data['propositions'], graph_number)
-
-        added_edges = []
-        ignored_edges = set()
-        save = None
-
-        if bfs_connexity(graph_data):
-            print("\nLe réseau de transport est déjà connexe.")
-        else:
-            print("\nLe réseau de transport n'est pas connexe.")
-
-            # Identifier et afficher les sous-graphes connexes
-            components = find_connected_components(graph_data)
-            draw_transport_graph_with_components(graph_data, graph_number, components)
-
-            # Trouver les arêtes minimales pour rendre le graphe connexe
-            while not bfs_connexity(graph_data):
-                combinaison_minimale = trouver_combinaison_minimale(graph_data, ignored_edges)
-                if combinaison_minimale is None:
-                    print("Aucune autre arête ne peut être ajoutée sans créer de cycle.")
-                    break
-                i, j = combinaison_minimale
-                if not detect_cycle_with_edge(graph_data, (i, j)):
-                    save = (i, j)
-                    graph_data['propositions'][i][j] += 1
-                    added_edges.append((i, j))
-                    print(f"L'arrête P{i + 1}-C{j + 1} a été ajoutée pour améliorer la connexité.")
-                else:
-                    print(f"L'ajout de l'arête P{i + 1}-C{j + 1} créerait un cycle. Arête non ajoutée.")
-                    ignored_edges.add((i, j))
-
-            print("\nLe réseau de transport est maintenant connexe.")
-        if save and (i, j) in save:
-            graph_data['propositions'][save[0]][save[1]] = 0
-        draw_transport_graph(graph_data, graph_number, added_edges, save)
+        connexity(graph_data, graph_number)
 
     elif choice == 4:
+        connexity(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts potentiels" + Fore.RESET + " ─────────── ✦")
+
+        print("\nCalcul des potentiels :")
         potentiel=calcul_potentiels(graph_data)
-        calcul_couts_potentiels(graph_data, potentiel)
+        couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
+        display_matrix_2d(couts_potentiel_tab, graph_number,"potentiels")
 
     elif choice == 5:
+        connexity(graph_data, graph_number)
+
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
+        
+        potentiel = calcul_potentiels(graph_data)
+        couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
+        couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
+
+        display_matrix_2d(couts_marginaux_tab, graph_number,"marginaux")
+
+
+    elif choice == 6:
+        connexity(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Coûts totaux" + Fore.RESET + " ─────────── ✦")
         cout_totaux(graph_data)
 
     elif choice == 8:
+
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
 
         draw_transport_graph(graph_data, graph_number)
@@ -203,7 +231,7 @@ def change_table():
             else:
                 print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 12.\n")
         except ValueError:
-            print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 4.")
+            print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 9.")
 
 
 # Lancer le programme
@@ -230,6 +258,3 @@ if __name__ == "__main__":
                 print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 12.\n")
         except ValueError as e:
             print(Fore.RED + "\n  ⚠" + Fore.RESET + " [ERROR] Détail de l'erreur : " + Fore.RED + str(e) + "\n" + Style.RESET_ALL)
-
-
-

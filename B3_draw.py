@@ -15,45 +15,38 @@ def draw_transport_graph(graph_data, graph_number, added_edges=None, save=None):
     dot.attr(rankdir='LR', size='8,5')
     dot.node_attr.update(shape='circle', style='filled')
 
-    is_connex = ""
-
-    # Ajouter les nœuds des fournisseurs avec une couleur spécifique
+    # Ajouter les nœuds des fournisseurs et des clients avec des couleurs spécifiques.
     for i in range(graph_data['taille'][0]):
         dot.node(f'F{i+1}', f'P{i+1}', color='lightblue')
-
-    # Ajouter les nœuds des clients avec une autre couleur spécifique
     for j in range(graph_data['taille'][1]):
         dot.node(f'C{j+1}', f'C{j+1}', color='peachpuff')
 
-    # Ajouter les arcs avec les propositions de transport seulement si elles sont non nulles
+    # Traitement et ajout des arêtes au graphique.
     for i, row in enumerate(graph_data['couts']):
         for j, cost in enumerate(row):
             proposition = graph_data["propositions"][i][j]
-            # Vérifier si la proposition est non nulle
-            if proposition > 0:
-                # Utilisation de HTML pour la couleur du texte
+            edge_color = 'black'
+            label = f'<{proposition} <FONT COLOR="blue">({cost})</FONT>>'
 
-                # Si l'arête est une des arêtes ajoutées et added_edges n'est pas None, mettre sa proposition à 0
-                if added_edges and (i, j) in added_edges:
-                    proposition = 0
+            # Gestion des arêtes ajoutées pour la connexité
+            if (i, j) in added_edges:
+                edge_color = 'red'
+                label = f'<{proposition} <FONT COLOR="red">({cost})</FONT>>'  # Mettre en rouge avec la valeur actuelle
 
-                label = f'<{proposition} <FONT COLOR="blue">({cost})</FONT>>'
-                edge_color = 'black'
+            # Gérer l'arête à sauvegarder spécifiquement
+            if save and (i, j) == save:
+                label = f'<0 <FONT COLOR="red">({cost})</FONT>>'  # Force la proposition à 0 et en rouge
 
-                # Si l'arête est une des arêtes ajoutées et added_edges n'est pas None, la colorier en rouge
-                if added_edges and (i, j) in added_edges:
-                    edge_color = 'red'
-                    is_connex = "- Non Dégénéré"
-
-                dot.attr(label=f"Graphe {graph_number}{is_connex}", fontsize='20')
-
+            if proposition > 0 or (i, j) in added_edges or (i, j) == save:
                 dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor=edge_color, color=edge_color, dir="none")
 
-            # save = (i, j)
-            if save and (i, j) == save:
-                label = f'<{0} <FONT COLOR="blue">({cost})</FONT>>'
-                dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor='red', color='red', dir="none")
+    # Configuration du label du graphe avec une indication si des modifications non dégénératives ont été apportées
+    if added_edges:
+        dot.attr(label=f"Graphe {graph_number} - Non Dégénéré", fontsize='20')
+    else:
+        dot.attr(label=f"Graphe {graph_number}", fontsize='20')
 
+    # Enregistrer le fichier DOT et ouvrir la visualisation
     dot.render(f'data/graph/transport_graph_{graph_number}', format='pdf', view=True)
 
 # Fonction pour dessiner le graphe de transport avec les composants connexes
