@@ -404,3 +404,18 @@ def calcul_couts_marginaux(graph_data, couts_potentiels):
             tableau[i][j] = graph_data['couts'][i][j] - couts_potentiels[i][j]
 
     return tableau
+
+def cout_totaux(graph_data):
+    total_cost = 0
+    # Obtenir le nombre de fournisseurs (rows) et de clients (columns)
+    num_fournisseurs, num_clients = graph_data['taille']
+
+    # Itérer sur chaque cellule de propositions
+    for i in range(num_fournisseurs):
+        for j in range(num_clients):
+            if graph_data['propositions'][i][j] > 0:  # Vérifier si la proposition n'est pas nulle
+                cost = graph_data['couts'][i][j]
+                proposition = graph_data['propositions'][i][j]
+                total_cost += cost * proposition  # Multiplier le coût par la proposition et ajouter au coût total
+
+    print(f'Coup total : {total_cost}' )
