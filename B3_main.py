@@ -85,10 +85,12 @@ def execute_choice(choice, graph_data, graph_number):
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
 
         # Demander à l'utilisateur de choisir l'algorithme
-        print("Choisissez l'algorithme à utiliser :")
+        print("\nChoisissez l'algorithme à utiliser :")
         print("1. Algorithme de Nord-Ouest")
         print("2. Algorithme de Balas-Hammer")
-        algo_choice = input("")
+
+        print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
+        algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
 
         # Méthode de Nord-Ouest
         if algo_choice == "1":
@@ -107,36 +109,64 @@ def execute_choice(choice, graph_data, graph_number):
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
 
         draw_transport_graph(graph_data, graph_number)
+
+
     elif choice == 3:
-        # Appliquer l'algorithme du coin Nord-Ouest pour initialiser les propositions
-        graph_data['propositions'] = nord_ouest_method(graph_data)
-        print('Voici la méthode du coin Nord-Ouest :')
+
+        # Demander à l'utilisateur de choisir l'algorithme
+        print("\nChoisissez l'algorithme à utiliser :")
+        print("1. Algorithme de Nord-Ouest")
+        print("2. Algorithme de Balas-Hammer")
+        print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
+        algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
+        method = ""
+
+        # Méthode de Nord-Ouest
+        if algo_choice == 1:
+            graph_data['propositions'] = nord_ouest_method(graph_data)
+            method = "Nord-Ouest"
+
+        # Méthode de Balas-Hammer
+        elif algo_choice == 2:
+            graph_data['propositions'] = balas_hammer_method(graph_data)
+            method = "Balas-Hammer"
+
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + f"Affichage des potentiels avec {method}" + Fore.RESET + " ─────────── ✦")
+
         display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'],
                        graph_data['propositions'], graph_number)
 
-        # Vérifier la connexité du réseau
+        added_edges = []
+        ignored_edges = set()
         if bfs_connexity(graph_data):
             print("\nLe réseau de transport est déjà connexe.")
         else:
             print("\nLe réseau de transport n'est pas connexe.")
-            # Identifier les sous-graphes connexes
+
+            # Identifier et afficher les sous-graphes connexes
             components = find_connected_components(graph_data)
-            # Dessiner les sous-graphes connexes identifiés
             draw_transport_graph_with_components(graph_data, graph_number, components)
 
-            # Tant que le réseau n'est pas connexe, ajouter les arêtes nécessaires
-            added_edges = []
+            # Trouver les arêtes minimales pour rendre le graphe connexe
             while not bfs_connexity(graph_data):
-                combinaison_minimale = trouver_combinaison_minimale(graph_data)
-                # Ajouter l'arête minimale trouvée
+                combinaison_minimale = trouver_combinaison_minimale(graph_data, ignored_edges)
+                if combinaison_minimale is None:
+                    print("Aucune autre arête ne peut être ajoutée sans créer de cycle.")
+                    break
                 i, j = combinaison_minimale
-                graph_data['propositions'][i][j] += 1
-                added_edges.append((i, j))
-                print(f"Ajout de l'arête P{i + 1}C{j + 1} pour améliorer la connexité.")
+                if not detect_cycle_with_edge(graph_data, (i, j)):
+                    graph_data['propositions'][i][j] += 1
+                    added_edges.append((i, j))
+                    print(f"L'arrête P{i + 1}-C{j + 1} a été ajoutée pour améliorer la connexité.")
+                else:
+                    print(f"L'ajout de l'arête P{i + 1}-C{j + 1} créerait un cycle. Arête non ajoutée.")
+                    ignored_edges.add((i, j))
 
             print("\nLe réseau de transport est maintenant connexe.")
-            # Dessiner le graphe final avec toutes les arêtes ajoutées pour rendre le réseau connexe
-            draw_transport_graph(graph_data, graph_number, added_edges)
+
+        draw_transport_graph(graph_data, graph_number, added_edges)
+
+
     elif choice == 4:
         print('ok')
 

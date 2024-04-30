@@ -238,111 +238,63 @@ def find_connected_components(graph_data):
     return components
 
 
+# Fonction pour calculer les potentiels
 def calcul_potentiels(graph_data):
-    # Initialiser les potentiels
+    """
+    Calculer les potentiels pour les fournisseurs et les clients.
+    :param graph_data: Dictionnaire contenant les données du graphe
+    :return: Dictionnaire contenant les potentiels
+    """
+    # Initialiser les potentiels avec le premier fournisseur
+    potentiels = {'P1': 0}
+
+    # Vérifier la connexité du graphe
+    if not bfs_connexity(graph_data):
+        rendre_graphe_connexe(graph_data)
+
+    # Réinitialiser les potentiels après l'ajout des arêtes
     potentiels = {'P1': 0}
 
     # Parcourir les coûts et les propositions pour trouver les arêtes avec une proposition non nulle
     for i, row in enumerate(graph_data['couts']):
         for j, cout in enumerate(row):
             proposition = graph_data['propositions'][i][j]
-            if proposition != 0 or (i, j) == graph_data.get('combinaison_minimale', (-1, -1)):
+            if proposition != 0:
                 Pi = 'P{}'.format(i + 1)
                 Cj = 'C{}'.format(j + 1)
                 if Pi in potentiels and Cj not in potentiels:
-                    # Mettre à jour E(Cj) si Pi est connu et Cj est inconnu
                     potentiels[Cj] = potentiels[Pi] - cout
                     print("E({}) - E({}) = {}".format(Pi, Cj, cout))
                 elif Cj in potentiels and Pi not in potentiels:
-                    # Stocker temporairement le calcul pour une utilisation ultérieure
                     potentiels[Pi] = cout + potentiels[Cj]
                     print("E({}) - E({}) = {}".format(Pi, Cj, cout))
 
-    # Afficher les résultats
+    # Afficher les résultats finaux des potentiels
     print('\nRésultats des potentiels :')
     for key, value in potentiels.items():
         print("E({}) = {}".format(key, value))
 
-    return potentiels.items()
+    return potentiels
 
 
-def calcul_potentiels_not_connexe(graph_data):
-    # Initialiser les potentiels
-    potentiels = {'P1': 0}
-
-    # Trouver la combinaison minimale
-    combinaison_minimale = trouver_combinaison_minimale(graph_data)
-
-    # Créer une copie de graph_data
-    graph_data_copy = graph_data.copy()
-
-    print('\nCalculs potentiels par sommets :')
-
-    # Modifier la copie pour prendre en compte la nouvelle proposition
-    if combinaison_minimale:
-        i, j = combinaison_minimale
-        graph_data_copy['propositions'][i][j] = -1  # Initialiser la valeur à -1
-
-    # Répéter les calculs jusqu'à la convergence
-    while len(potentiels) < graph_data['taille'][0] + graph_data['taille'][1]:
-        updated = False  # Variable pour suivre si des mises à jour ont été effectuées
-
-        # Parcourir les propositions de la copie pour mettre à jour les potentiels
-        for i, row in enumerate(graph_data_copy['couts']):
-            for j, cout in enumerate(row):
-                proposition = graph_data_copy['propositions'][i][j]
-                if proposition != 0 or (i, j) == combinaison_minimale:
-                    Pi = 'P{}'.format(i + 1)
-                    Cj = 'C{}'.format(j + 1)
-                    if Pi not in potentiels and Cj in potentiels:
-                        potentiels[Pi] = cout + potentiels[Cj]
-                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
-                        updated = True
-                    elif Cj not in potentiels and Pi in potentiels:
-                        potentiels[Cj] = potentiels[Pi] - cout
-                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
-                        updated = True
-
-        # Vérifier si des mises à jour ont été effectuées, sinon sortir de la boucle
-        if not updated:
-            break
-
-    # Afficher les résultats
-    print('\nRésultats des potentiels :')
-    for key, value in potentiels.items():
-        print("E({}) = {}".format(key, value))
-
-    return potentiels.items()
-
-
-
-def trouver_combinaison_minimale(graph_data):
-    # Créer une copie temporaire des coûts
+def trouver_combinaison_minimale(graph_data, ignore_set):
     couts_temp = [row[:] for row in graph_data['couts']]
+    n, m = graph_data['taille']
+    for i in range(n):
+        for j in range(m):
+            if (i, j) in ignore_set or graph_data['propositions'][i][j] != 0:
+                couts_temp[i][j] = float('inf')  # Ignorer cette arête
 
-    # Trouver la valeur minimale dans les coûts
-    couts_minimaux = min(min(row) for row in couts_temp)
+    # Trouver la valeur minimale dans les coûts ajustés
+    min_value = float('inf')
+    min_pos = None
+    for i in range(n):
+        for j in range(m):
+            if couts_temp[i][j] < min_value:
+                min_value = couts_temp[i][j]
+                min_pos = (i, j)
+    return min_pos
 
-    # Parcourir les coûts copiés pour trouver l'indice de la valeur minimale
-    for i, row in enumerate(couts_temp):
-        for j, cout in enumerate(row):
-            if cout == couts_minimaux:
-                indice_minimal_i = i
-                indice_minimal_j = j
-                break
-
-    # Vérifier si la proposition associée a une valeur nulle
-    if graph_data['propositions'][indice_minimal_i][indice_minimal_j] == 0:
-        combinaison_minimale = (indice_minimal_i, indice_minimal_j)
-        print("L'arrête à ajouter pour l'obtention d'une proposition non dégénérée est P{}-C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
-
-    else:
-        # Mettre à jour les coûts copiés pour exclure la proposition associée
-        couts_temp[indice_minimal_i][indice_minimal_j] = float('inf')
-        # Appeler récursivement la fonction en utilisant les copies modifiées
-        combinaison_minimale = trouver_combinaison_minimale({'couts': couts_temp, 'propositions': graph_data['propositions']})
-
-    return combinaison_minimale
 
 
 # Fonction pour vérifier la connexité du graphe
@@ -352,6 +304,8 @@ def rendre_graphe_connexe(graph_data):
     :param graph_data: Dictionnaire contenant les données du graphe
     :return: None
     """
+    ignored_edges = set()
+
     # Vérifier si le graphe est déjà connexe
     if graph_data['propositions'] is None:
         graph_data['propositions'] = [[0] * graph_data['taille'][1] for _ in range(graph_data['taille'][0])]
@@ -359,10 +313,25 @@ def rendre_graphe_connexe(graph_data):
     # Tant que le graphe n'est pas connexe, ajouter des arêtes
     while not bfs_connexity(graph_data):
         # Trouver une arête minimale à ajouter qui n'introduit pas de cycle
-        combinaison_minimale = trouver_combinaison_minimale(graph_data)
+        combinaison_minimale = trouver_combinaison_minimale(graph_data, ignored_edges)
         i, j = combinaison_minimale
         # Ajouter cette arête au graphe
         graph_data['propositions'][i][j] += 1  # Incrémenter la proposition
         print(f"Ajout de l'arête P{i + 1}C{j + 1} pour améliorer la connexité.")
 
     print("Le graphe est maintenant connexe.")
+
+
+def detect_cycle_with_edge(graph_data, edge):
+    # Initialisation
+    total_vertices = sum(graph_data['taille'])
+    visited = [False] * total_vertices
+
+    # Convertir l'arête dans les index de la liste visited
+    edge_indices = (edge[0], edge[1] + graph_data['taille'][0])
+
+    # Vérifiez si un chemin existe déjà entre les deux sommets de l'arête améliorante
+    if path_exists(graph_data, edge_indices[0], edge_indices[1], visited):
+        # Si un chemin existe, l'ajout de cette arête créerait un cycle
+        return True
+    return False
