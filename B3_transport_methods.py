@@ -54,64 +54,91 @@ def balas_hammer_method(graph_data):
     :return: Matrice des propositions de transport
     """
     # Initialisation
-    provisions = graph_data['provisions'].copy()
-    commandes = graph_data['commandes'].copy()
-    costs = deepcopy(graph_data['couts'])  # Copie des coûts pour éviter les modifications sur graph_data
-    taille = graph_data['taille']
-    fournisseurs, clients = taille
+    provisions = graph_data['provisions'].copy()  # Copie des provisions
+    commandes = graph_data['commandes'].copy()  # Copie des commandes
+    costs = deepcopy(graph_data['couts'])  # Copie des coûts
+    taille = graph_data['taille']  # Dimensions du tableau
+    fournisseurs, clients = taille  # Nombre de fournisseurs et de clients
 
-    # Tableau initial de toutes les attributions à zéro
+    # Initialisation de la matrice des propositions avec des zéros
     propositions = [[0 for _ in range(clients)] for _ in range(fournisseurs)]
 
-
     while sum(provisions) > 0 and sum(commandes) > 0:
-
-        # Calcul des pénalités pour chaque ligne
         delta_rows = []
         for row in costs:
-            valid_costs = [cost for cost in row if cost != float('inf')]  # Coûts valides (non infinis)
-            if valid_costs:
-                delta_rows.append(max(valid_costs) - min(valid_costs))
+            valid_costs = [cost for cost in row if cost != float('inf')]
+            if len(valid_costs) > 1:
+                sorted_costs = sorted(valid_costs)
+                delta_rows.append(sorted_costs[1] - sorted_costs[0])
             else:
                 delta_rows.append(-float('inf'))
 
-        # Calcul des pénalités pour chaque colonne
         delta_cols = []
         for j in range(clients):
-            valid_costs = [costs[i][j] for i in range(fournisseurs) if costs[i][j] != float('inf')]  # Coûts valides (non infinis)
-            if valid_costs:
-                delta_cols.append(max(valid_costs) - min(valid_costs))
+            valid_costs = [costs[i][j] for i in range(fournisseurs) if costs[i][j] != float('inf')]
+            if len(valid_costs) > 1:
+                sorted_costs = sorted(valid_costs)
+                delta_cols.append(sorted_costs[1] - sorted_costs[0])
             else:
                 delta_cols.append(-float('inf'))
 
-        # Sélectionner la ligne ou la colonne avec la plus grande pénalité
         max_delta_row = max(delta_rows)
         max_delta_col = max(delta_cols)
 
-        # Si toutes les lignes et colonnes sont infinies, arrêter le processus
-        if max_delta_row == -float('inf') and max_delta_col == -float('inf'):
-            break
-
-        # Récupération de la cellule avec le coût minimum dans la ligne/colonne sélectionnée
+        # Determiner l'origine de la pénalité maximale et chercher l'arête correspondante
         if max_delta_row >= max_delta_col:
-            i = delta_rows.index(max_delta_row)  # Indice de la ligne sélectionnée
-            filtered_row = [costs[i][j] for j in range(clients) if costs[i][j] != float('inf')]
-            min_cost = min(filtered_row)  # Coût minimum dans la ligne sélectionnée
-            j = costs[i].index(min_cost)  # Indice de la colonne sélectionnée
+            chosen_indexes = [i for i, val in enumerate(delta_rows) if val == max_delta_row]
         else:
-            j = delta_cols.index(max_delta_col)  # Indice de la colonne sélectionnée
-            filtered_col = [costs[i][j] for i in range(fournisseurs) if costs[i][j] != float('inf')]
-            min_cost = min(filtered_col)  # Coût minimum dans la colonne sélectionnée
-            i = next(i for i in range(fournisseurs) if costs[i][j] == min_cost)  # Indice de la ligne sélectionnée
+            chosen_indexes = [j for j, val in enumerate(delta_cols) if val == max_delta_col]
 
-        # Maximiser la cellule sélectionnée en fonction des provisions et des commandes
-        quantity = min(provisions[i], commandes[j])  # Quantité maximale entre les provisions et les commandes
-        propositions[i][j] += quantity   # Ajout de la quantité à la cellule sélectionnée
-        provisions[i] -= quantity  # Mise à jour des provisions
-        commandes[j] -= quantity  # Mise à jour des commandes
+        min_cost = float('inf')
+        for index in chosen_indexes:
+            if max_delta_row >= max_delta_col:
+                for j in range(clients):
+                    if costs[index][j] != float('inf') and costs[index][j] < min_cost:
+                        min_cost = costs[index][j]
+                        chosen_i, chosen_j = index, j
+            else:
+                for i in range(fournisseurs):
+                    if costs[i][index] != float('inf') and costs[i][index] < min_cost:
+                        min_cost = costs[i][index]
+                        chosen_i, chosen_j = i, index
 
-        # Marquage de la cellule comme utilisée en fixant son coût à infini
-        costs[i][j] = float('inf')
+        # Affichage de l'arête choisie avec toutes les informations nécessaires
+        print(
+            f"\n\nArête choisie pour remplissage : {Fore.LIGHTBLUE_EX}P{chosen_i + 1}{Style.RESET_ALL} - {Fore.LIGHTMAGENTA_EX}C{chosen_j + 1}{Style.RESET_ALL}")
+        print(f"Coût minimal trouvé : {Fore.LIGHTWHITE_EX}{min_cost}{Style.RESET_ALL}")
+        print(f"Quantité remplie : {Back.WHITE}{Fore.BLACK}{min(provisions[chosen_i], commandes[chosen_j])}{Style.RESET_ALL}")
+
+        # Maximisation de la cellule choisie
+        quantity = min(provisions[chosen_i], commandes[chosen_j])
+        propositions[chosen_i][chosen_j] += quantity
+        provisions[chosen_i] -= quantity
+        commandes[chosen_j] -= quantity
+        costs[chosen_i][chosen_j] = float('inf')  # Marquage de la cellule comme utilisée
+
+        if provisions[chosen_i] == 0:
+            for k in range(clients):
+                costs[chosen_i][k] = float('inf')
+
+        if commandes[chosen_j] == 0:
+            for k in range(fournisseurs):
+                costs[k][chosen_j] = float('inf')
+
+        print("----------------------------------------------")
+        print("\nPénalités pour les lignes :")
+        for i, delta in enumerate(delta_rows):
+            if delta == -float('inf'):
+                print(f"P{i + 1} : /")
+            else:
+                print(f"P{i + 1} : {delta}")
+
+        print("\nPénalités pour les colonnes :")
+        for j, delta in enumerate(delta_cols):
+            if delta == -float('inf'):
+                print(f"C{j + 1} : /")
+            else:
+                print(f"C{j + 1} : {delta}")
 
     return propositions
 
