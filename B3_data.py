@@ -168,6 +168,8 @@ def calcul_potentiels_not_connexe(graph_data):
     for key, value in potentiels.items():
         print("E({}) = {}".format(key, value))
 
+    return potentiels.items()
+
 
 def calcul_potentiels(graph_data):
     # Initialiser les potentiels
@@ -193,6 +195,8 @@ def calcul_potentiels(graph_data):
     print('\nRésultats des potentiels :')
     for key, value in potentiels.items():
         print("E({}) = {}".format(key, value))
+
+    return potentiels.items()
 
 
 def nord_ouest(graph_data):
