@@ -245,14 +245,8 @@ def calcul_potentiels(graph_data):
     :param graph_data: Dictionnaire contenant les données du graphe
     :return: Dictionnaire contenant les potentiels
     """
-    # Initialiser les potentiels avec le premier fournisseur
-    potentiels = {'P1': 0}
 
-    # Vérifier la connexité du graphe
-    if not bfs_connexity(graph_data):
-        rendre_graphe_connexe(graph_data)
-
-    # Réinitialiser les potentiels après l'ajout des arêtes
+    # Initialiser les potentiels après l'ajout des arêtes
     potentiels = {'P1': 0}
 
     # Parcourir les coûts et les propositions pour trouver les arêtes avec une proposition non nulle

@@ -49,14 +49,8 @@ def main_menu(graph_data, graph_number):
 
 
         # Choix du menu
-        elif choice in [1, 2, 3, 4]:
-            '''# Lire + enregistrer les données de la table de contraintes sous forme de matrice
-            constraints_table = matrice_table(graph_number)
+        elif choice in [1, 2, 3, 4, 6, 7, 8, 9]:
 
-            # Stockage du tableau de contraintes dans la mémoire
-            graph_data = store_constraints_in_memory(constraints_table)  # Stockage du graphe en mémoire
-            graph_data = {key: graph_data[key] for key in sorted(graph_data)}  # Trier par ordre de nœud
-'''
             execute_choice(choice, graph_data, graph_number)
 
             # Ajout de la demande pour continuer ou quitter le programme
@@ -110,7 +104,6 @@ def execute_choice(choice, graph_data, graph_number):
 
         draw_transport_graph(graph_data, graph_number)
 
-
     elif choice == 3:
 
         # Demander à l'utilisateur de choisir l'algorithme
@@ -138,6 +131,8 @@ def execute_choice(choice, graph_data, graph_number):
 
         added_edges = []
         ignored_edges = set()
+        save = None
+
         if bfs_connexity(graph_data):
             print("\nLe réseau de transport est déjà connexe.")
         else:
