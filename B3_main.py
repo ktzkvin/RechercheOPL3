@@ -118,15 +118,13 @@ def execute_choice(choice, graph_data, graph_number):
             print("\nLe réseau de transport est connexe.")
         else:
             print("\nLe réseau de transport n'est pas connexe.")
+            combinaison_minimale = trouver_combinaison_minimale(graph_data)
+            draw_transport_graph(graph_data, graph_number, combinaison_minimale)
 
-        combinaison_minimale = trouver_combinaison_minimale(graph_data)
-        print(combinaison_minimale)
-        draw_transport_graph(graph_data, graph_number, combinaison_minimale)
-
-        if detect_cycle_bfs(graph_data, combinaison_minimale):
-            print("\nLe réseau de transport est acyclique.")
-        else:
-            print("\nLe réseau de transport contient un cycle.")
+            if detect_cycle_with_edge(graph_data, combinaison_minimale):
+                print("Le réseau de transport est cyclique.")
+            else:
+                print("Le réseau de transport est acyclique.")
 
     elif choice == 4:
         print('ok')
