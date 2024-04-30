@@ -1,4 +1,6 @@
 from B3_data import *
+from B3_draw import *
+from B3_transport_methods import *
 from colorama import Fore, Back, Style, init
 
 # Initialiser les couleurs pour le terminal
@@ -23,7 +25,7 @@ def main_menu(graph_data, graph_number):
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage de l'algorithme")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " ... ")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage des potentiels ")
 
         print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
@@ -88,48 +90,60 @@ def execute_choice(choice, graph_data, graph_number):
         print("2. Algorithme de Balas-Hammer")
         algo_choice = input("")
 
+        # Méthode de Nord-Ouest
         if algo_choice == "1":
-            if graph_data:
-                graph_data['propositions'] = nord_ouest(graph_data)
-                display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
-            else:
-                print("Aucune donnée chargée. Veuillez charger les données.")
+            graph_data['propositions'] = nord_ouest_method(graph_data)
+
+        # Méthode de Balas-Hammer
         elif algo_choice == "2":
-            # Insérer le code pour l'algorithme de Balas-Hammer ici
-            pass  # Temporairement laissé vide
+            graph_data['propositions'] = balas_hammer_method(graph_data)
+
         else:
             print("Choix invalide. Veuillez entrer 1 ou 2 pour sélectionner l'algorithme.")
 
+        display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
 
     elif choice == 2:
-        # Vérifier si le diagramme est non connexe
-        if connexe(graph_data):
-            trouver_combinaison_minimale(graph_data)
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
 
-        print('\nPotentiels par sommets :')
-        calcul_potentiels(graph_data)
+        draw_transport_graph(graph_data, graph_number)
 
     elif choice == 3:
 
-        graph_data['propositions'] = nord_ouest(graph_data)
+        graph_data['propositions'] = nord_ouest_method(graph_data)
         print('Voici la méthode du coin Nord-Ouest :')
         display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
-        resultat_connexe = connexe(graph_data)
-        # Vérifier si le diagramme est non connexe
-        if resultat_connexe == 1:
-            trouver_combinaison_minimale(graph_data)
-            print('\nCalculs potentiels par sommets :')
-            calcul_potentiels_not_connexe(graph_data)
-        elif resultat_connexe == 0:
-            print('\nCalculs potentiels par sommets :')
-            calcul_potentiels(graph_data)
-        elif resultat_connexe == 2:
-            print('\nCalculer les arrêtes')
+
+        if bfs_connexity(graph_data):
+            print("\nLe réseau de transport est connexe.")
+        else:
+            print("\nLe réseau de transport n'est pas connexe.")
+
+        # Should return False if there's a cycle, True if acyclic
+        # return True  # Aucun cycle trouvé
+
+
+        trouver_combinaison_minimale(graph_data)
+        """ adjust_transport_table()
+        
+    return {
+        "taille": graph_data['taille'],
+        "couts": couts,
+        "provisions": provisions,
+        "commandes": commandes,
+        "propositions": graph_data['propositions'],
+        "combinaison_minimale": combinaison_minimale
+    }
+    """
+
+
+        if is_acyclic_bfs(graph_data):
+            print("\nLe réseau de transport est acyclique.")
+        else:
+            print("\nLe réseau de transport contient un cycle.")
 
     elif choice == 4:
         print('ok')
-
-
 
 
 # Fonction pour changer la table de contraintes

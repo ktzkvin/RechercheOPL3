@@ -140,43 +140,59 @@ def bfs_connexity(graph_data):
     return all(visited)  # Le graphe est connexe si tous les sommets ont été visités
 
 
-def is_acyclic_bfs(graph_data):
+def detect_cycle_bfs(graph_data, combinaison_améliorante):
+    """
+    Utiliser un parcours en largeur (BFS) pour détecter un cycle dans le graphe (edmuns-karp)
+    :param graph_data: données du graphe
+    :param combinaison_améliorante: combinaison améliorante = (i, j) pour ajouter une arête qui n'est pas dans graph
+    :return: True si un cycle est détecté, False sinon
+
+    ex combinaison_améliorante : L'arête à ajouter pour l'obtention d'une proposition non dégénérée est P10C14
+    => retourne (9, 13)
+    """
+
+    # Initialisation : extraire les dimensions du graphe
     num_fournisseurs, num_clients = graph_data['taille']
+
+    # Total de sommets (fournisseurs + clients)
     total_vertices = num_fournisseurs + num_clients
-    visited = [False] * total_vertices
-    parent = [-1] * total_vertices
-    queue = deque()
+    visited = [False] * total_vertices  # Initialiser tous les sommets comme non visités
+    queue = deque([0])  # Commencer par le premier fournisseur
 
-    # Envisagez chaque fournisseur et chaque client comme un point de départ potentiel
-    for start in range(total_vertices):
-        if not visited[start]:
-            queue.append(start)
-            visited[start] = True
+    # Parcours en largeur (BFS) pour trouver les connexions
+    while queue:
+        vertex = queue.popleft()  # Extraire le sommet de la file
+        if not visited[vertex]:  # Si le sommet n'a pas été visité
+            visited[vertex] = True  # Marquer le sommet comme visité
 
-            while queue:
-                current = queue.popleft()
+            # Ajouter les sommets adjacents à la file :
+            if vertex < num_fournisseurs:  # Ce sommet est un fournisseur
 
-                # Déterminer les voisins en fonction du type de sommet
-                if current < num_fournisseurs:  # Sommet actuel est un fournisseur
-                    for j in range(num_clients):
-                        neighbor = num_fournisseurs + j
-                        if graph_data['propositions'][current][j] > 0:
-                            if visited[neighbor] and parent[current] != neighbor:
-                                return False  # Un cycle a été trouvé
-                            if not visited[neighbor]:
-                                visited[neighbor] = True
-                                parent[neighbor] = current
-                                queue.append(neighbor)
-                else:  # Sommet actuel est un client
-                    client_index = current - num_fournisseurs
-                    for i in range(num_fournisseurs):
-                        neighbor = i
-                        if graph_data['propositions'][i][client_index] > 0:
-                            if visited[neighbor] and parent[current] != neighbor:
-                                return False  # Un cycle a été trouvé
-                            if not visited[neighbor]:
-                                visited[neighbor] = True
-                                parent[neighbor] = current
-                                queue.append(neighbor)
+                # Parcourir les propositions pour trouver les clients connectés
+                for j in range(num_clients):
+                    # Si proposition de la cellule > 0 et le client n'a pas été visité
+                    if graph_data['propositions'][vertex][j] > 0 and not visited[num_fournisseurs + j]:
+                        queue.append(num_fournisseurs + j)  # Ajouter le client à la file
 
-    return True  # Aucun cycle détecté
+            else:  # Ce sommet est un client
+                client_index = vertex - num_fournisseurs  # Indice du client dans les propositions
+                for i in range(num_fournisseurs):
+                    # Si proposition de la cellule > 0 et le fournisseur n'a pas été visité
+                    if graph_data['propositions'][i][client_index] > 0 and not visited[i]:
+                        queue.append(i)  # Ajouter le fournisseur à la file
+
+    # Ajouter l'arête de la combinaison améliorante à la liste des propositions
+    i, j = combinaison_améliorante
+    graph_data['propositions'][i][j] += 1
+
+    # Vérifier si le graphe est connexe après l'ajout de l'arête
+    is_connected = bfs_connexity(graph_data)
+
+    # Retirer l'arête ajoutée
+    graph_data['propositions'][i][j] -= 1
+
+    return not is_connected  # Un cycle est détecté si le graphe n'est pas connexe après l'ajout de l'arête
+
+
+
+
