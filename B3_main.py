@@ -86,8 +86,8 @@ def execute_choice(choice, graph_data, graph_number):
 
         # Demander à l'utilisateur de choisir l'algorithme
         print("\nChoisissez l'algorithme à utiliser :")
-        print("1. Algorithme de Nord-Ouest")
-        print("2. Algorithme de Balas-Hammer")
+        print("1. Algorithme de "+ Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
+        print("2. Algorithme de "+ Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
 
         print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
         algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
@@ -115,8 +115,8 @@ def execute_choice(choice, graph_data, graph_number):
 
         # Demander à l'utilisateur de choisir l'algorithme
         print("\nChoisissez l'algorithme à utiliser :")
-        print("1. Algorithme de Nord-Ouest")
-        print("2. Algorithme de Balas-Hammer")
+        print("1. Algorithme de "+ Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
+        print("2. Algorithme de "+ Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
         print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
         algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
         method = ""
