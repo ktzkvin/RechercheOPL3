@@ -1,6 +1,6 @@
 from graphviz import Digraph
 
-def draw_transport_graph(graph_data, graph_number):
+def draw_transport_graph(graph_data, graph_number, arete_ameliorante=None):
     dot = Digraph()
     dot.attr(rankdir='LR', size='8,5')
     dot.node_attr.update(shape='circle', style='filled')
@@ -20,6 +20,11 @@ def draw_transport_graph(graph_data, graph_number):
             if proposition > 0:  # Vérifier si la proposition est non nulle
                 # Utilisation de HTML pour le label
                 label = f'<{proposition} <FONT COLOR="blue">({cost})</FONT>>'
-                dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor='black')
+                dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor='black', dir='none')
+
+    # Ajouter les arêtes améliorantes si elles sont fournies
+    if arete_ameliorante:
+        i, j = arete_ameliorante
+        dot.edge(f'F{i+1}', f'C{j+1}', color='red', style='bold', dir='none')
 
     dot.render(f'data/graph/transport_graph_{graph_number}', format='pdf', view=True)
