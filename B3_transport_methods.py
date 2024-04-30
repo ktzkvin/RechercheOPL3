@@ -1,4 +1,4 @@
-import copy
+from copy import deepcopy
 from collections import deque
 
 
@@ -55,7 +55,7 @@ def balas_hammer_method(graph_data):
     # Initialisation
     provisions = graph_data['provisions'].copy()
     commandes = graph_data['commandes'].copy()
-    costs = copy.deepcopy(graph_data['couts'])  # Copie des coûts pour éviter les modifications sur graph_data
+    costs = deepcopy(graph_data['couts'])  # Copie des coûts pour éviter les modifications sur graph_data
     taille = graph_data['taille']
     fournisseurs, clients = taille
 
@@ -316,7 +316,6 @@ def rendre_graphe_connexe(graph_data):
         combinaison_minimale = trouver_combinaison_minimale(graph_data, ignored_edges)
         i, j = combinaison_minimale
         # Ajouter cette arête au graphe
-        graph_data['propositions'][i][j] += 1  # Incrémenter la proposition
         print(f"Ajout de l'arête P{i + 1}C{j + 1} pour améliorer la connexité.")
 
     print("Le graphe est maintenant connexe.")
