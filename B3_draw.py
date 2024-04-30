@@ -46,7 +46,13 @@ def draw_transport_graph(graph_data, graph_number, added_edges=None, save=None):
                     is_connex = "- Non Dégénéré"
 
                 dot.attr(label=f"Graphe {graph_number}{is_connex}", fontsize='20')
+
                 dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor=edge_color, color=edge_color, dir="none")
+
+            # save = (i, j)
+            if save and (i, j) == save:
+                label = f'<{0} <FONT COLOR="blue">({cost})</FONT>>'
+                dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor='red', color='red', dir="none")
 
     dot.render(f'data/graph/transport_graph_{graph_number}', format='pdf', view=True)
 

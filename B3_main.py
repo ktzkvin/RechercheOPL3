@@ -26,9 +26,11 @@ def main_menu(graph_data, graph_number):
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage de l'algorithme")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage des potentiels ")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Connexité du graphe")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "4." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage des potentiels ")
 
-        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
+        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Changer le tableau de contraintes")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
 
         if graph_number < 10:
             print("\n╚" + "═" * 23 + Fore.LIGHTWHITE_EX + " Table : " + str(graph_number) + Fore.RESET + " " + "═" * 24 + "╝")
@@ -159,13 +161,16 @@ def execute_choice(choice, graph_data, graph_number):
                     ignored_edges.add((i, j))
 
             print("\nLe réseau de transport est maintenant connexe.")
-
+        graph_data['propositions'][save[0]][save[1]] = 0
         draw_transport_graph(graph_data, graph_number, added_edges, save)
 
-
     elif choice == 4:
-        print('ok')
 
+        print(calcul_potentiels(graph_data))
+
+    elif choice == 6:
+
+        cout_totaux(graph_data)
 
 # Fonction pour changer la table de contraintes
 def change_table():

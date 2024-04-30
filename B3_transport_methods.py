@@ -64,11 +64,11 @@ def balas_hammer_method(graph_data):
 
 
     while sum(provisions) > 0 and sum(commandes) > 0:
-        
+
         # Calcul des pénalités...
-        
+
         # ...pour chaque ligne
-        delta_rows = []        
+        delta_rows = []
         for row in costs:
             valid_costs = [cost for cost in row if cost != float('inf')]  # Coûts valides (non infinis)
             if valid_costs:
@@ -238,37 +238,82 @@ def find_connected_components(graph_data):
     return components
 
 
-# Fonction pour calculer les potentiels
-def calcul_potentiels(graph_data):
-    """
-    Calculer les potentiels pour les fournisseurs et les clients.
-    :param graph_data: Dictionnaire contenant les données du graphe
-    :return: Dictionnaire contenant les potentiels
-    """
+def calcul_potentiels_not_connexe(graph_data):
+    # Initialiser les potentiels
+    potentiels = {'P1': 0}
 
-    # Initialiser les potentiels après l'ajout des arêtes
+    # Trouver la combinaison minimale
+    combinaison_minimale = trouver_combinaison_minimale(graph_data)
+
+    # Créer une copie de graph_data
+    graph_data_copy = graph_data.copy()
+
+    print('\nCalculs potentiels par sommets :')
+
+    # Modifier la copie pour prendre en compte la nouvelle proposition
+    if combinaison_minimale:
+        i, j = combinaison_minimale
+        graph_data_copy['propositions'][i][j] = -1  # Initialiser la valeur à -1
+
+    # Répéter les calculs jusqu'à la convergence
+    while len(potentiels) < graph_data['taille'][0] + graph_data['taille'][1]:
+        updated = False  # Variable pour suivre si des mises à jour ont été effectuées
+
+        # Parcourir les propositions de la copie pour mettre à jour les potentiels
+        for i, row in enumerate(graph_data_copy['couts']):
+            for j, cout in enumerate(row):
+                proposition = graph_data_copy['propositions'][i][j]
+                if proposition != 0 or (i, j) == combinaison_minimale:
+                    Pi = 'P{}'.format(i + 1)
+                    Cj = 'C{}'.format(j + 1)
+                    if Pi not in potentiels and Cj in potentiels:
+                        potentiels[Pi] = cout + potentiels[Cj]
+                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                        updated = True
+                    elif Cj not in potentiels and Pi in potentiels:
+                        potentiels[Cj] = potentiels[Pi] - cout
+                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                        updated = True
+
+        # Vérifier si des mises à jour ont été effectuées, sinon sortir de la boucle
+        if not updated:
+            break
+
+    # Afficher les résultats
+    print('\nRésultats des potentiels :')
+    for key, value in potentiels.items():
+        print("E({}) = {}".format(key, value))
+
+    return potentiels.items()
+
+
+def calcul_potentiels(graph_data):
+    print(graph_data)
+    # Initialiser les potentiels
     potentiels = {'P1': 0}
 
     # Parcourir les coûts et les propositions pour trouver les arêtes avec une proposition non nulle
     for i, row in enumerate(graph_data['couts']):
         for j, cout in enumerate(row):
             proposition = graph_data['propositions'][i][j]
-            if proposition != 0:
+            if proposition != 0 or (i, j) == graph_data.get('combinaison_minimale', (-1, -1)):
                 Pi = 'P{}'.format(i + 1)
                 Cj = 'C{}'.format(j + 1)
                 if Pi in potentiels and Cj not in potentiels:
+                    # Mettre à jour E(Cj) si Pi est connu et Cj est inconnu
                     potentiels[Cj] = potentiels[Pi] - cout
                     print("E({}) - E({}) = {}".format(Pi, Cj, cout))
                 elif Cj in potentiels and Pi not in potentiels:
+                    # Stocker temporairement le calcul pour une utilisation ultérieure
                     potentiels[Pi] = cout + potentiels[Cj]
                     print("E({}) - E({}) = {}".format(Pi, Cj, cout))
 
-    # Afficher les résultats finaux des potentiels
+    # Afficher les résultats
     print('\nRésultats des potentiels :')
     for key, value in potentiels.items():
         print("E({}) = {}".format(key, value))
 
-    return potentiels
+    return potentiels.items()
 
 
 def trouver_combinaison_minimale(graph_data, ignore_set):
