@@ -2,7 +2,13 @@ import copy
 from collections import deque
 
 
+# Fonction pour appliquer la méthode de Nord-Ouest
 def nord_ouest_method(graph_data):
+    """
+    Applique la méthode de Nord-Ouest pour résoudre le problème de transport.
+    :param graph_data: Dictionnaire contenant les données du problème de transport
+    :return: Matrice des propositions de transport
+    """
     # Récupérer les dimensions du tableau
     n = len(graph_data['provisions'])
     m = len(graph_data['commandes'])
@@ -11,8 +17,8 @@ def nord_ouest_method(graph_data):
     provisions_copie = graph_data['provisions'][:]
     commandes_copie = graph_data['commandes'][:]
 
-    # Initialiser la matrice d'allocation avec des zéros
-    allocation = [[0 for _ in range(m)] for _ in range(n)]
+    # Initialiser la matrice des propositions avec des zéros
+    propositions = [[0 for _ in range(m)] for _ in range(n)]
 
     # Indices pour parcourir les lignes et les colonnes
     i = 0
@@ -22,7 +28,7 @@ def nord_ouest_method(graph_data):
     while i < n and j < m:
         # Allouer autant que possible en partant du coin nord-ouest
         quantity = min(provisions_copie[i], commandes_copie[j])
-        allocation[i][j] = quantity
+        propositions[i][j] = quantity
 
         # Mettre à jour les provisions et les commandes restantes dans les copies
         provisions_copie[i] -= quantity
@@ -36,11 +42,16 @@ def nord_ouest_method(graph_data):
         if commandes_copie[j] == 0:
             j += 1
 
-    return allocation
+    return propositions
 
 
+# Fonction pour appliquer la méthode de Balas-Hammer
 def balas_hammer_method(graph_data):
-
+    """
+    Applique la méthode de Balas-Hammer pour résoudre le problème de transport.
+    :param graph_data: Dictionnaire contenant les données du problème de transport
+    :return: Matrice des propositions de transport
+    """
     # Initialisation
     provisions = graph_data['provisions'].copy()
     commandes = graph_data['commandes'].copy()
@@ -106,7 +117,13 @@ def balas_hammer_method(graph_data):
     return propositions
 
 
+# Fonction pour vérifier la connexité du graphe en utilisant un parcours en largeur (Breadth-First Search)
 def bfs_connexity(graph_data):
+    """
+    Vérifie si le graphe est connexe en utilisant un parcours en largeur (BFS).
+    :param graph_data: Données du graphe
+    :return: True si le graphe est connexe, False sinon
+    """
     # Initialisation : extraire les dimensions du graphe
     num_fournisseurs, num_clients = graph_data['taille']
 
@@ -140,59 +157,16 @@ def bfs_connexity(graph_data):
     return all(visited)  # Le graphe est connexe si tous les sommets ont été visités
 
 
-def detect_cycle_bfs(graph_data, combinaison_améliorante):
+# Fonction pour vérifier si un chemin existe entre deux sommets dans le graphe
+def path_exists(graph_data, start, end, visited):
     """
-    Utiliser un parcours en largeur (BFS) pour détecter un cycle dans le graphe (edmuns-karp)
-    :param graph_data: données du graphe
-    :param combinaison_améliorante: combinaison améliorante = (i, j) pour ajouter une arête qui n'est pas dans graph
-    :return: True si un cycle est détecté, False sinon
-
-    ex combinaison_améliorante : L'arête à ajouter pour l'obtention d'une proposition non dégénérée est P10C14 => retourne (9, 13)
+    Vérifie s'il existe un chemin entre deux sommets dans le graphe.
+    :param graph_data: Dictionnaire contenant les données du graphe
+    :param start: Sommet de départ
+    :param end: Sommet d'arrivée
+    :param visited: Liste des sommets visités
+    :return: True si un chemin existe, False sinon
     """
-
-    # Initialisation : extraire les dimensions du graphe
-    num_fournisseurs, num_clients = graph_data['taille']
-
-    # Total de sommets (fournisseurs + clients)
-    total_vertices = num_fournisseurs + num_clients
-    visited = [False] * total_vertices  # Initialiser tous les sommets comme non visités
-    queue = deque([0])  # Commencer par le premier fournisseur
-
-    # Parcours en largeur (BFS) pour trouver les connexions
-    while queue:
-        vertex = queue.popleft()  # Extraire le sommet de la file
-        if not visited[vertex]:  # Si le sommet n'a pas été visité
-            visited[vertex] = True  # Marquer le sommet comme visité
-
-            # Ajouter les sommets adjacents à la file :
-            if vertex < num_fournisseurs:  # Ce sommet est un fournisseur
-
-                # Parcourir les propositions pour trouver les clients connectés
-                for j in range(num_clients):
-                    # Si proposition de la cellule > 0 et le client n'a pas été visité
-                    if graph_data['propositions'][vertex][j] > 0 and not visited[num_fournisseurs + j]:
-                        queue.append(num_fournisseurs + j)  # Ajouter le client à la file
-
-            else:  # Ce sommet est un client
-                client_index = vertex - num_fournisseurs  # Indice du client dans les propositions
-                for i in range(num_fournisseurs):
-                    # Si proposition de la cellule > 0 et le fournisseur n'a pas été visité
-                    if graph_data['propositions'][i][client_index] > 0 and not visited[i]:
-                        queue.append(i)  # Ajouter le fournisseur à la file
-
-    # Ajouter l'arête de la combinaison améliorante à la liste des propositions
-    i, j = combinaison_améliorante
-    graph_data['propositions'][i][j] += 1
-
-    # Vérifier si le graphe est connexe après l'ajout de l'arête
-    is_connected = bfs_connexity(graph_data)
-
-    # Retirer l'arête ajoutée
-    graph_data['propositions'][i][j] -= 1
-
-    return not is_connected  # Un cycle est détecté si le graphe n'est pas connexe après l'ajout de l'arête
-
-def existe_chemin(graph_data, start, end, visited):
     # Parcours en largeur (BFS) pour trouver s'il existe un chemin de start à end
     queue = deque([start])
     visited[start] = True
@@ -200,49 +174,43 @@ def existe_chemin(graph_data, start, end, visited):
         current = queue.popleft()
         if current == end:
             return True  # Chemin trouvé
-        # Check the neighbors
-        if current < len(graph_data['propositions']):  # If current is a provider
-            # Iterate through clients connected to this provider
+        # Parcourir les propositions pour trouver les sommets adjacents
+        if current < len(graph_data['propositions']):  #
             for j in range(len(graph_data['propositions'][current])):
                 if graph_data['propositions'][current][j] > 0:
-                    neighbor = j + len(graph_data['propositions'])  # Mapping to client index
+                    neighbor = j + len(graph_data['propositions'])  # Indice du client
                     if not visited[neighbor]:
                         visited[neighbor] = True
                         queue.append(neighbor)
-        else:  # current is a client
+        else:  # C'est un client
             client_index = current - len(graph_data['propositions'])
-            # Iterate through providers for this client
+            # Parcourir les propositions pour trouver les sommets adjacents
             for i in range(len(graph_data['propositions'])):
                 if graph_data['propositions'][i][client_index] > 0:
                     if not visited[i]:
                         visited[i] = True
                         queue.append(i)
-    return False  # No path found
+    return False  # Pas de chemin trouvé
 
 
-def detect_cycle_with_edge(graph_data, edge):
-    # Initialisation
-    total_vertices = sum(graph_data['taille'])
-    visited = [False] * total_vertices
-
-    # Convertir l'arête dans les index de la liste visited
-    edge_indices = (edge[0], edge[1] + graph_data['taille'][0])
-
-    # Vérifiez si un chemin existe déjà entre les deux sommets de l'arête améliorante
-    if existe_chemin(graph_data, edge_indices[0], edge_indices[1], visited):
-        # Si un chemin existe, l'ajout de cette arête créerait un cycle
-        return True
-    return False
-
-from collections import deque
-
+# Fonction pour trouver les composants connexes du graphe
 def find_connected_components(graph_data):
+    """
+    Trouve les composants connexes du graphe en utilisant un parcours en largeur (BFS).
+    :param graph_data: Dictionnaire contenant les données du graphe
+    :return: Liste des composants connexes
+    """
     num_fournisseurs, num_clients = graph_data['taille']
     total_vertices = num_fournisseurs + num_clients
     visited = [False] * total_vertices
     components = []
 
     def bfs(start_vertex):
+        """
+        Parcours en largeur (BFS) pour trouver les composants connexes.
+        :param start_vertex: Sommet de départ
+        :return: Liste des sommets du composant connexe
+        """
         queue = deque([start_vertex])
         component = []
         visited[start_vertex] = True
@@ -268,3 +236,133 @@ def find_connected_components(graph_data):
             components.append(bfs(v))
 
     return components
+
+
+def calcul_potentiels(graph_data):
+    # Initialiser les potentiels
+    potentiels = {'P1': 0}
+
+    # Parcourir les coûts et les propositions pour trouver les arêtes avec une proposition non nulle
+    for i, row in enumerate(graph_data['couts']):
+        for j, cout in enumerate(row):
+            proposition = graph_data['propositions'][i][j]
+            if proposition != 0 or (i, j) == graph_data.get('combinaison_minimale', (-1, -1)):
+                Pi = 'P{}'.format(i + 1)
+                Cj = 'C{}'.format(j + 1)
+                if Pi in potentiels and Cj not in potentiels:
+                    # Mettre à jour E(Cj) si Pi est connu et Cj est inconnu
+                    potentiels[Cj] = potentiels[Pi] - cout
+                    print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                elif Cj in potentiels and Pi not in potentiels:
+                    # Stocker temporairement le calcul pour une utilisation ultérieure
+                    potentiels[Pi] = cout + potentiels[Cj]
+                    print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+
+    # Afficher les résultats
+    print('\nRésultats des potentiels :')
+    for key, value in potentiels.items():
+        print("E({}) = {}".format(key, value))
+
+    return potentiels.items()
+
+
+def calcul_potentiels_not_connexe(graph_data):
+    # Initialiser les potentiels
+    potentiels = {'P1': 0}
+
+    # Trouver la combinaison minimale
+    combinaison_minimale = trouver_combinaison_minimale(graph_data)
+
+    # Créer une copie de graph_data
+    graph_data_copy = graph_data.copy()
+
+    print('\nCalculs potentiels par sommets :')
+
+    # Modifier la copie pour prendre en compte la nouvelle proposition
+    if combinaison_minimale:
+        i, j = combinaison_minimale
+        graph_data_copy['propositions'][i][j] = -1  # Initialiser la valeur à -1
+
+    # Répéter les calculs jusqu'à la convergence
+    while len(potentiels) < graph_data['taille'][0] + graph_data['taille'][1]:
+        updated = False  # Variable pour suivre si des mises à jour ont été effectuées
+
+        # Parcourir les propositions de la copie pour mettre à jour les potentiels
+        for i, row in enumerate(graph_data_copy['couts']):
+            for j, cout in enumerate(row):
+                proposition = graph_data_copy['propositions'][i][j]
+                if proposition != 0 or (i, j) == combinaison_minimale:
+                    Pi = 'P{}'.format(i + 1)
+                    Cj = 'C{}'.format(j + 1)
+                    if Pi not in potentiels and Cj in potentiels:
+                        potentiels[Pi] = cout + potentiels[Cj]
+                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                        updated = True
+                    elif Cj not in potentiels and Pi in potentiels:
+                        potentiels[Cj] = potentiels[Pi] - cout
+                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+                        updated = True
+
+        # Vérifier si des mises à jour ont été effectuées, sinon sortir de la boucle
+        if not updated:
+            break
+
+    # Afficher les résultats
+    print('\nRésultats des potentiels :')
+    for key, value in potentiels.items():
+        print("E({}) = {}".format(key, value))
+
+    return potentiels.items()
+
+
+
+def trouver_combinaison_minimale(graph_data):
+    # Créer une copie temporaire des coûts
+    couts_temp = [row[:] for row in graph_data['couts']]
+
+    # Trouver la valeur minimale dans les coûts
+    couts_minimaux = min(min(row) for row in couts_temp)
+
+    # Parcourir les coûts copiés pour trouver l'indice de la valeur minimale
+    for i, row in enumerate(couts_temp):
+        for j, cout in enumerate(row):
+            if cout == couts_minimaux:
+                indice_minimal_i = i
+                indice_minimal_j = j
+                break
+
+    # Vérifier si la proposition associée a une valeur nulle
+    if graph_data['propositions'][indice_minimal_i][indice_minimal_j] == 0:
+        combinaison_minimale = (indice_minimal_i, indice_minimal_j)
+        print("L'arrête à ajouter pour l'obtention d'une proposition non dégénérée est P{}-C{}".format(indice_minimal_i + 1, indice_minimal_j + 1))
+
+    else:
+        # Mettre à jour les coûts copiés pour exclure la proposition associée
+        couts_temp[indice_minimal_i][indice_minimal_j] = float('inf')
+        # Appeler récursivement la fonction en utilisant les copies modifiées
+        combinaison_minimale = trouver_combinaison_minimale({'couts': couts_temp, 'propositions': graph_data['propositions']})
+
+    return combinaison_minimale
+
+
+# Fonction pour vérifier la connexité du graphe
+def rendre_graphe_connexe(graph_data):
+    """
+    Rendre le graphe connexe en ajoutant des arêtes.
+    :param graph_data: Dictionnaire contenant les données du graphe
+    :return: None
+    """
+    # Vérifier si le graphe est déjà connexe
+    if graph_data['propositions'] is None:
+        graph_data['propositions'] = [[0] * graph_data['taille'][1] for _ in range(graph_data['taille'][0])]
+
+    # Tant que le graphe n'est pas connexe, ajouter des arêtes
+    while not bfs_connexity(graph_data):
+        # Trouver une arête minimale à ajouter qui n'introduit pas de cycle
+        combinaison_minimale = trouver_combinaison_minimale(graph_data)
+        i, j = combinaison_minimale
+        # Ajouter cette arête au graphe
+        graph_data['propositions'][i][j] += 1  # Incrémenter la proposition
+        print(f"Ajout de l'arête P{i + 1}C{j + 1} pour améliorer la connexité.")
+
+    print("Le graphe est maintenant connexe.")
