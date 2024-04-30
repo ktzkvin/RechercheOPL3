@@ -24,12 +24,18 @@ def main_menu(graph_data, graph_number):
     continue_running = True
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage de l'algorithme")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Matrice des coûts")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "2." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Proposition de transport (NO/BH)")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "3." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Connexité du graphe")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "4." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Affichage des potentiels ")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "4." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Calcul des coûts potentiels")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Coûts Totaux")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "6." + Back.RESET + Fore.RESET + Style.RESET_ALL + " ...")
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "7." + Back.RESET + Fore.RESET + Style.RESET_ALL + " ...")
 
-        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Changer le tableau de contraintes")
+
+        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "8. BONUS " + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe (nécessite une proposition de transport)")
+
+        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "9." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Changer le tableau de contraintes")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
 
         if graph_number < 10:
@@ -51,7 +57,7 @@ def main_menu(graph_data, graph_number):
 
 
         # Choix du menu
-        elif choice in [1, 2, 3, 4, 6, 7, 8, 9]:
+        elif choice in [1, 2, 3, 4, 6, 7, 8]:
 
             execute_choice(choice, graph_data, graph_number)
 
@@ -61,7 +67,7 @@ def main_menu(graph_data, graph_number):
                 print(Fore.RED + "\n✧" + Fore.RESET + " Programme quitté. " + Fore.RED + "✧\n" + Fore.RESET)
 
         # Changer la table de contraintes
-        elif choice == 5:
+        elif choice == 9:
             new_graph_number = change_table()
             if new_graph_number is not None:
                 graph_number = new_graph_number
@@ -78,7 +84,12 @@ def main_menu(graph_data, graph_number):
 def execute_choice(choice, graph_data, graph_number):
 
     if choice == 1:
-        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "..." + Fore.RESET + " ─────────── ✦")
+
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Matrice des coûts" + Fore.RESET + " ─────────── ✦")
+        display_matrix_cost_only(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_number)
+
+    elif choice == 2:
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Proposition de Transport" + Fore.RESET + " ─────────── ✦")
 
         # Demander à l'utilisateur de choisir l'algorithme
         print("\nChoisissez l'algorithme à utiliser :")
@@ -99,14 +110,10 @@ def execute_choice(choice, graph_data, graph_number):
         else:
             print("Choix invalide. Veuillez entrer 1 ou 2 pour sélectionner l'algorithme.")
 
-        display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
-
-    elif choice == 2:
-        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
-
-        draw_transport_graph(graph_data, graph_number)
+        display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
 
     elif choice == 3:
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Connexité du graphe" + Fore.RESET + " ─────────── ✦")
 
         # Demander à l'utilisateur de choisir l'algorithme
         print("\nChoisissez l'algorithme à utiliser :")
@@ -128,8 +135,8 @@ def execute_choice(choice, graph_data, graph_number):
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + f"Affichage des potentiels avec {method}" + Fore.RESET + " ─────────── ✦")
 
-        display_matrix(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'],
-                       graph_data['propositions'], graph_number)
+        display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'],
+                                 graph_data['propositions'], graph_number)
 
         added_edges = []
         ignored_edges = set()
@@ -161,16 +168,26 @@ def execute_choice(choice, graph_data, graph_number):
                     ignored_edges.add((i, j))
 
             print("\nLe réseau de transport est maintenant connexe.")
-        graph_data['propositions'][save[0]][save[1]] = 0
+        if save and (i, j) in save:
+            graph_data['propositions'][save[0]][save[1]] = 0
         draw_transport_graph(graph_data, graph_number, added_edges, save)
 
     elif choice == 4:
 
-        print(calcul_potentiels(graph_data))
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts potentiels" + Fore.RESET + " ─────────── ✦")
+        potentiel=calcul_potentiels(graph_data)
+        calcul_couts_potentiels(graph_data, potentiel)
 
-    elif choice == 6:
+    elif choice == 5:
 
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Coûts totaux" + Fore.RESET + " ─────────── ✦")
         cout_totaux(graph_data)
+
+    elif choice == 8:
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
+
+        draw_transport_graph(graph_data, graph_number)
+
 
 # Fonction pour changer la table de contraintes
 def change_table():

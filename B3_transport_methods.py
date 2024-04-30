@@ -405,7 +405,14 @@ def calcul_couts_marginaux(graph_data, couts_potentiels):
 
     return tableau
 
+
+# Fonction pour calculer les coûts totaux
 def cout_totaux(graph_data):
+    """
+    Calculer le coût total du transport en multipliant les coûts par les propositions.
+    :param graph_data: Dictionnaire contenant les données du problème de transport
+    :return: None
+    """
     total_cost = 0
     # Obtenir le nombre de fournisseurs (rows) et de clients (columns)
     num_fournisseurs, num_clients = graph_data['taille']
