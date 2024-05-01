@@ -2,7 +2,7 @@ from graphviz import Digraph
 
 
 # Fonction pour dessiner le graphe de transport
-def draw_transport_graph(graph_data, graph_number, added_edges=None, save=None):
+def draw_transport_graph(graph_data, graph_number, added_edges=None):
     """
     Dessiner le graphe de transport avec les propositions de transport
     :param graph_data: informations sur le graphe
@@ -29,15 +29,11 @@ def draw_transport_graph(graph_data, graph_number, added_edges=None, save=None):
             label = f'<{proposition} <FONT COLOR="blue">({cost})</FONT>>'
 
             # Gestion des arêtes ajoutées pour la connexité
-            if (i, j) in added_edges:
+            if added_edges and (i, j) in added_edges:
+                label = f'<0 <FONT COLOR="red">({cost})</FONT>>'  # Mettre en rouge avec la proposition à zéro
                 edge_color = 'red'
-                label = f'<{proposition} <FONT COLOR="red">({cost})</FONT>>'  # Mettre en rouge avec la valeur actuelle
 
-            # Gérer l'arête à sauvegarder spécifiquement
-            if save and (i, j) == save:
-                label = f'<0 <FONT COLOR="red">({cost})</FONT>>'  # Force la proposition à 0 et en rouge
-
-            if proposition > 0 or (i, j) in added_edges or (i, j) == save:
+            if proposition > 0 or (added_edges and (i, j) in added_edges):
                 dot.edge(f'F{i+1}', f'C{j+1}', label=label, fontcolor=edge_color, color=edge_color, dir="none")
 
     # Configuration du label du graphe avec une indication si des modifications non dégénératives ont été apportées

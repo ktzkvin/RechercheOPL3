@@ -71,7 +71,7 @@ def connexity(graph_data, graph_number):
         print("\nLe réseau de transport est maintenant connexe.")
     if save and (i, j) in save:
         graph_data['propositions'][save[0]][save[1]] = 0
-    draw_transport_graph(graph_data, graph_number, added_edges, save)
+    draw_transport_graph(graph_data, graph_number, added_edges)
 
 
 # Fonction pour mettre en pause (demande pour continuer ou non)
