@@ -188,7 +188,7 @@ def execute_choice(choice, graph_data, graph_number):
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts potentiels" + Fore.RESET + " ─────────── ✦")
 
         print("\nCalcul des potentiels :")
-        potentiel=calcul_potentiels(graph_data)
+        potentiel = calcul_potentiels(graph_data)
         couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
         display_matrix_2d(couts_potentiel_tab, graph_number,"potentiels")
 
@@ -196,7 +196,7 @@ def execute_choice(choice, graph_data, graph_number):
         connexity(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
-        
+
         potentiel = calcul_potentiels(graph_data)
         couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
         couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
@@ -206,9 +206,28 @@ def execute_choice(choice, graph_data, graph_number):
 
         # vérification technique marchepied : vérifier si les coûts marginaux sont négatifs
         i, j = is_marginal_negative(couts_marginaux_tab)
-        if i is not None:
+        while i is not None:
             print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i+1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
-            marche_pied(graph_data, i, j)
+            print(graph_data['propositions'])
+            graph_data['propositions'] = stepping_stone_method(graph_data, i, j)
+            print(graph_data['propositions'])
+            # Afficher le tableau final
+            print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
+            display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'],
+                                     graph_data['commandes'], graph_data['propositions'], graph_number)
+
+            potentiel = calcul_potentiels(graph_data)
+            couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
+            couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
+
+            display_matrix_2d(couts_potentiel_tab, graph_number, "potentiels")
+            display_matrix_2d(couts_marginaux_tab, graph_number, "marginaux")
+
+            i, j = is_marginal_negative(couts_marginaux_tab)
+
+            # pause pour continuer ou non
+            if not continue_prompt():
+                break
 
     elif choice == 6:
         connexity(graph_data, graph_number)

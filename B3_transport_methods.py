@@ -1,4 +1,6 @@
+from B3_data import *
 from copy import deepcopy
+import copy
 from collections import deque
 from colorama import Back, Fore, Style
 
@@ -282,79 +284,30 @@ def find_connected_components(graph_data):
     return components
 
 
-def calcul_potentiels_not_connexe(graph_data):
-    # Initialiser les potentiels
-    potentiels = {'P1': 0}
-
-    # Trouver la combinaison minimale
-    combinaison_minimale = trouver_combinaison_minimale(graph_data)
-
-    # Créer une copie de graph_data
-    graph_data_copy = graph_data.copy()
-
-    print('\nCalculs potentiels par sommets :')
-
-    # Modifier la copie pour prendre en compte la nouvelle proposition
-    if combinaison_minimale:
-        i, j = combinaison_minimale
-        graph_data_copy['propositions'][i][j] = -1  # Initialiser la valeur à -1
-
-    # Répéter les calculs jusqu'à la convergence
-    while len(potentiels) < graph_data['taille'][0] + graph_data['taille'][1]:
-        updated = False  # Variable pour suivre si des mises à jour ont été effectuées
-
-        # Parcourir les propositions de la copie pour mettre à jour les potentiels
-        for i, row in enumerate(graph_data_copy['couts']):
-            for j, cout in enumerate(row):
-                proposition = graph_data_copy['propositions'][i][j]
-                if proposition != 0 or (i, j) == combinaison_minimale:
-                    Pi = 'P{}'.format(i + 1)
-                    Cj = 'C{}'.format(j + 1)
-                    if Pi not in potentiels and Cj in potentiels:
-                        potentiels[Pi] = cout + potentiels[Cj]
-                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
-                        updated = True
-                    elif Cj not in potentiels and Pi in potentiels:
-                        potentiels[Cj] = potentiels[Pi] - cout
-                        print("E({}) - E({}) = {}".format(Pi, Cj, cout))
-                        updated = True
-
-        # Vérifier si des mises à jour ont été effectuées, sinon sortir de la boucle
-        if not updated:
-            break
-
-    # Afficher les résultats
-    print('\nRésultats des potentiels :')
-    for key, value in potentiels.items():
-        print("E({}) = {}".format(key, value))
-
-    return potentiels.items()
-
-
 def calcul_potentiels(graph_data):
-    # Initialiser les potentiels
-    potentiels = {'P1': 0}
+    potentiels = {'P1': 0}  # Initialisation avec le potentiel du premier fournisseur
+    changes = True  # Pour suivre s'il y a eu des modifications
 
-    # Parcourir les coûts et les propositions pour trouver les arêtes avec une proposition non nulle
-    for i, row in enumerate(graph_data['couts']):
-        for j, cout in enumerate(row):
-            proposition = graph_data['propositions'][i][j]
-            if proposition != 0 or (i, j) == graph_data.get('combinaison_minimale', (-1, -1)):
-                Pi = 'P{}'.format(i + 1)
-                Cj = 'C{}'.format(j + 1)
-                if Pi in potentiels and Cj not in potentiels:
-                    # Mettre à jour E(Cj) si Pi est connu et Cj est inconnu
-                    potentiels[Cj] = potentiels[Pi] - cout
-                    print("E({}) - E({}) = {}".format(Pi, Cj, cout))
-                elif Cj in potentiels and Pi not in potentiels:
-                    # Stocker temporairement le calcul pour une utilisation ultérieure
-                    potentiels[Pi] = cout + potentiels[Cj]
-                    print("E({}) - E({}) = {}".format(Pi, Cj, cout))
+    while changes:
+        changes = False  # Réinitialiser le drapeau de changement pour cette itération
+        for i, row in enumerate(graph_data['couts']):
+            for j, cout in enumerate(row):
+                proposition = graph_data['propositions'][i][j]
+                if proposition != 0:  # Seulement les arêtes utilisées
+                    Pi = f"P{i + 1}"
+                    Cj = f"C{j + 1}"
+                    if Pi in potentiels and Cj not in potentiels:
+                        potentiels[Cj] = potentiels[Pi] - cout
+                        print(f"E({Pi}) - E({Cj}) = {cout}")
+                        changes = True
+                    elif Cj in potentiels and Pi not in potentiels:
+                        potentiels[Pi] = cout + potentiels[Cj]
+                        print(f"E({Pi}) - E({Cj}) = {cout}")
+                        changes = True
 
-    # Afficher les résultats
     print('\nRésultats des potentiels :')
     for key, value in potentiels.items():
-        print("E({}) = {}".format(key, value))
+        print(f"E({key}) = {value}")
 
     return potentiels
 
@@ -426,7 +379,14 @@ def detect_cycle_with_edge(graph_data, edge):
     return False, path
 
 
+# Fonction pour calculer les coûts potentiels
 def calcul_couts_potentiels(graph_data, dict_items):
+    """
+    Calculer les coûts potentiels pour chaque cellule du tableau.
+    :param graph_data: Dictionnaire contenant les données du problème de transport
+    :param dict_items: Dictionnaire contenant les valeurs des potentiels
+    :return: Tableau des coûts potentiels
+    """
     taille = graph_data['taille']
     tableau = [[0] * taille[1] for _ in range(taille[0])]
 
@@ -441,13 +401,13 @@ def calcul_couts_potentiels(graph_data, dict_items):
     return tableau
 
 
-
+# Fonction pour calculer les coûts marginaux
 def calcul_couts_marginaux(graph_data, couts_potentiels):
     """
     Calculer les coûts marginaux pour chaque cellule du tableau.
-    :param table: Dictionnaire contenant les données du problème de transport
-    :param couts_potentiels:
-    :return:
+    :param graph_data: Dictionnaire contenant les données du problème de transport
+    :param couts_potentiels: Tableau des coûts potentiels
+    :return: Tableau des coûts marginaux
     """
     taille = graph_data['taille']
     tableau = [[0] * taille[1] for _ in range(taille[0])]
@@ -483,16 +443,16 @@ def cout_totaux(graph_data):
                       f"{Fore.LIGHTWHITE_EX}{cost}{Style.RESET_ALL} x {Fore.LIGHTWHITE_EX}{proposition}{Style.RESET_ALL} = "
                       f"{Fore.LIGHTWHITE_EX}{cost * proposition}{Style.RESET_ALL}")
 
-
     print()
     print( "Coûts totaux : " + Back.LIGHTBLUE_EX + Fore.BLACK + f' {total_cost} ' + Style.RESET_ALL)
 
     return total_cost
 
 
+# Fonction pour vérifier si un coût marginal négatif existe
 def is_marginal_negative(couts_marginaux):
     """
-    Vérifie si tous les coûts marginaux sont négatifs.
+    Vérifie si au moins un coût marginal est négatif.
     :param couts_marginaux: Tableau des coûts marginaux
     :return: Le (i, j) du coût marginal le plus négatif
     """
@@ -506,17 +466,33 @@ def is_marginal_negative(couts_marginaux):
     return min_pos if min_value < 0 else (None, None)
 
 
-def marche_pied(graphe_data, i, j):
+def stepping_stone_method(graph_data, i, j):
     """
-    Si certains coûts marginaux sont négatifs, choisir l’arête de coût marginal le plus
-    petit (donc la valeur la plus grande dans le sens des négatifs), utiliser le cycle du
-    marche pied pour améliorer la proposition de transport, et répéter le processus
-    donc (i, j) est le coût marginal le plus négatif.
-    Il faut ajouter cette arête au graphes et vérifier la connexité avec
+    Applique la méthode de marche pied pour résoudre le problème de transport.
+    :param graph_data: Dictionnaire contenant les données du problème de transport
+    :param i: (int) Indice de la ligne de la cellule à ajuster
+    :param j: (int) Indice de la colonne de la cellule à ajuster
+    :return: Matrice des propositions de transport
+    """
+    propositions = copy.deepcopy(graph_data['propositions'])
+
+    cycle_exists, cycle_path = detect_cycle_with_edge(graph_data, (i, j))
+    cycle_path.append(cycle_path[0])
+    cycle_path = cycle_path[::-1]
+    if not cycle_exists:
+        print("Aucun cycle trouvé pour l'arête donnée.")
+        return False
+    else:
+        print("Cycle trouvé pour l'arête donnée : ", end="")
+        print(" -> ".join(cycle_path))
+
+    array_cycle = []
+    for k in range(len(cycle_path) - 1):
+        fournisseur = int(cycle_path[k][1:]) - 1
+        client = int(cycle_path[k + 1][1:]) - 1
+        array_cycle.append((fournisseur, client))
 
 
-    :param graphe_data: Dictionnaire contenant les données du problème de transport
-    :param i: Ligne du coût marginal négatif
-    :param j: Colonne du coût marginal négatif
-    :return:
-    """
+
+
+    return propositions
