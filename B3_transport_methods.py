@@ -467,39 +467,85 @@ def is_marginal_negative(couts_marginaux):
 
 
 def stepping_stone_method(graph_data, i, j):
+    """
+    Applique la méthode de marche pied pour résoudre le problème de transport.
+    :param graph_data: Dictionnaire contenant les données du problème de transport
+    :param i: (int) Indice de la ligne de la cellule à ajuster
+    :param j: (int) Indice de la colonne de la cellule à ajuster
+    :return: Matrice des propositions de transport
+    """
     propositions = copy.deepcopy(graph_data['propositions'])
 
-    # Trouver le cycle impliquant l'arête (i, j)
     cycle_exists, cycle_path = detect_cycle_with_edge(graph_data, (i, j))
+
     if not cycle_exists:
         print("Aucun cycle trouvé pour l'arête donnée.")
-        return propositions
+        return False
+    else:
+        cycle_path.append(cycle_path[0])
+        cycle_path = cycle_path[::-1]
+        print("Cycle trouvé pour l'arête donnée : ", end="")
+        print(" -> ".join(cycle_path))
 
-    cycle_path.append(cycle_path[0])
-    cycle_path = cycle_path[::-1]
-
-    print("Cycle trouvé pour l'arête donnée : ", " -> ".join(cycle_path))
-
+    # Créer un tableau pour stocker les arêtes du cycle, exemple : cycle_path = ['P1', 'C1', 'P2', 'C2'], array_cycle = [(0, 0), (0, 1), (1, 1), (1, 0)]
     array_cycle = []
     for k in range(len(cycle_path) - 1):
         fournisseur = int(cycle_path[k][1:]) - 1
         client = int(cycle_path[k + 1][1:]) - 1
         array_cycle.append((fournisseur, client))
 
-    min_quantity = float('inf')
-    for index, (f, c) in enumerate(array_cycle):
-        if index % 2 == 1:  # Choisir les arcs soustractifs
-            min_quantity = min(min_quantity, propositions[f][c])
 
-    if min_quantity == float('inf') or min_quantity == 0:
-        print("Aucun ajustement possible pour ce cycle.")
-        return propositions
+    # Mettre à 0 les propositions des arêtes du cycle array_cycle
+    for array in array_cycle:
+        i, j = array
+        propositions[i][j] = 0
 
-    # Ajuster les quantités selon le cycle
-    for index, (f, c) in enumerate(array_cycle):
-        if index % 2 == 0:
-            propositions[f][c] += min_quantity  # Ajouter à l'arc additif
-        else:
-            propositions[f][c] -= min_quantity  # Soustraire de l'arc soustractif
+    # Maximiser la proposition de la cellule (i, j)
+    for array in array_cycle:
+        # Récupérer les indices de la cellule à remplir
+        i, j = array
+
+        # Trouver le minimum entre les commandes et les provisions de la cellule
+        min_value = min(graph_data['provisions'][i], graph_data['commandes'][j])
+
+        # Trouver le maximum que je peux remplir par rapport à ce qu'il y a déjà dans la ligne/colonne de la cellule que je veux remplir
+        column = [propositions[k][j] for k in range(len(propositions))]
+        row = [propositions[i][k] for k in range(len(propositions[0]))]
+
+        """
+        prendre toutes les valeurs de la ligne et de la colonne de la cellule à remplir et les additionner = addition_ligne et addition_colonne, les mettre dans une liste à ranger par ordre croissant
+        ajouter les provisions et les commandes dans une liste puis ranger par ordre décroissant
+        soustraire à ce maximum le premier de la liste_addition rangée par ordre croissant
+        vérifier si le (résultat + somme des colonnes) est bien <= à la valeur provisions et (résultat + somme des lignes) <= à la valeur commandes de la cellule à remplir
+        si oui, on peut remplir la cellule avec cette valeur
+        sinon, on passe au second de la liste_addition et on refait le test
+        """
+        print("\n")
+        print(f"{Fore.LIGHTBLUE_EX}Cellule à remplir : ({i + 1}, {j + 1}){Style.RESET_ALL}")
+        print(f"ligne : {row}")
+        print(f"colonne : {column}")
+        addition_ligne = sum(row)
+        addition_colonne = sum(column)
+        liste_addition = [addition_ligne, addition_colonne]
+        liste_addition.sort()
+        print(f"Liste addition : {liste_addition}")
+        liste_provisions_commandes = [graph_data['provisions'][i], graph_data['commandes'][j]]
+        liste_provisions_commandes.sort(reverse=True)
+        for val_liste in liste_provisions_commandes:
+            print(f"    provisions : {graph_data['provisions'][i]}, commandes : {graph_data['commandes'][j]}, valeur prise : {val_liste}")
+            for value in liste_addition:
+                print(f"    val : {value}")
+                result = val_liste - value
+                print(f"    détail : {val_liste} - {value} = {result}")
+                if (result + addition_ligne) <= graph_data['provisions'][i] and (result + addition_colonne) <= graph_data['commandes'][j]:
+                    print(f"    La valeur {result} est possible pour la cellule ({i+1}, {j+1})")
+                    break
+                else:
+                    print(f"    {Fore.RED}Ne marche pas :{Style.RESET_ALL} {result} + {addition_ligne} => {graph_data['provisions'][i]} et {result} + {addition_colonne} => {graph_data['commandes'][j]}")
+            break
+
+        propositions[i][j] = result
+        graph_data['propositions'][i][j] = result
 
     return propositions
+

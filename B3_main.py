@@ -209,7 +209,6 @@ def execute_choice(choice, graph_data, graph_number):
         k = 0
         while i is not None:
             print(f" --------------------------------- {k} --------------------------------- ")
-            print(i, j)
             print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
             graph_data['propositions'] = stepping_stone_method(graph_data, i, j)
 
@@ -226,7 +225,6 @@ def execute_choice(choice, graph_data, graph_number):
             display_matrix_2d(couts_marginaux_tab, graph_number, "marginaux")
 
             i, j = is_marginal_negative(couts_marginaux_tab)
-            print(i, j)
 
             # pause pour continuer ou non
             if not continue_prompt():
