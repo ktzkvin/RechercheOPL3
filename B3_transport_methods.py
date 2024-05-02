@@ -477,7 +477,6 @@ def stepping_stone_method(graph_data, i, j):
 
     cycle_path.append(cycle_path[0])
     cycle_path = cycle_path[::-1]
-    print(cycle_path)
 
     print("Cycle trouvé pour l'arête donnée : ", " -> ".join(cycle_path))
 
