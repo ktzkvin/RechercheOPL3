@@ -486,6 +486,7 @@ def stepping_stone_method(graph_data, i, j):
         print("Cycle trouvé pour l'arête donnée : ", end="")
         print(" -> ".join(cycle_path))
 
+    # Créer un tableau pour stocker les arêtes du cycle, exemple : cycle_path = ['P1', 'C1', 'P2', 'C2'], array_cycle = [(0, 0), (0, 1), (1, 1), (1, 0)]
     array_cycle = []
     for k in range(len(cycle_path) - 1):
         fournisseur = int(cycle_path[k][1:]) - 1
@@ -494,6 +495,7 @@ def stepping_stone_method(graph_data, i, j):
 
     # Maximiser la proposition de la cellule (i, j)
     for array in array_cycle:
+        # Récupérer les indices de la cellule à remplir
         i, j = array
 
         # Trouver le minimum entre les commandes et les provisions de la cellule
