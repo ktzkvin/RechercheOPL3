@@ -505,8 +505,6 @@ def stepping_stone_method(graph_data, i, j):
         # Récupérer les indices de la cellule à remplir
         i, j = array
 
-        # Trouver le minimum entre les commandes et les provisions de la cellule
-        min_value = min(graph_data['provisions'][i], graph_data['commandes'][j])
 
         # Trouver le maximum que je peux remplir par rapport à ce qu'il y a déjà dans la ligne/colonne de la cellule que je veux remplir
         column = [propositions[k][j] for k in range(len(propositions))]
@@ -531,10 +529,11 @@ def stepping_stone_method(graph_data, i, j):
         print(f"Liste addition : {liste_addition}")
         liste_provisions_commandes = [graph_data['provisions'][i], graph_data['commandes'][j]]
         liste_provisions_commandes.sort(reverse=True)
-        for val_liste in liste_provisions_commandes:
-            print(f"    provisions : {graph_data['provisions'][i]}, commandes : {graph_data['commandes'][j]}, valeur prise : {val_liste}")
-            for value in liste_addition:
-                print(f"    val : {value}")
+        for value in liste_addition:
+            print(f"    val : {value}")
+            for val_liste in liste_provisions_commandes:
+                print(
+                    f"    provisions : {graph_data['provisions'][i]}, commandes : {graph_data['commandes'][j]}, valeur prise : {val_liste}")
                 result = val_liste - value
                 print(f"    détail : {val_liste} - {value} = {result}")
                 if (result + addition_ligne) <= graph_data['provisions'][i] and (result + addition_colonne) <= graph_data['commandes'][j]:
@@ -542,7 +541,6 @@ def stepping_stone_method(graph_data, i, j):
                     break
                 else:
                     print(f"    {Fore.RED}Ne marche pas :{Style.RESET_ALL} {result} + {addition_ligne} => {graph_data['provisions'][i]} et {result} + {addition_colonne} => {graph_data['commandes'][j]}")
-            break
 
         propositions[i][j] = result
         graph_data['propositions'][i][j] = result
