@@ -1,3 +1,5 @@
+import os
+
 from graphviz import Digraph
 
 
@@ -43,7 +45,21 @@ def draw_transport_graph(graph_data, graph_number, added_edges=None):
         dot.attr(label=f"Graphe {graph_number}", fontsize='20')
 
     # Enregistrer le fichier DOT et ouvrir la visualisation
-    dot.render(f'data/graph/transport_graph_{graph_number}', format='pdf', view=True)
+    dot.render(f'data/graph/transport_graph_{graph_number}', format='pdf', view=False)
+
+    file_path = f'data/graph/transport_graph_{graph_number}.pdf'
+
+    # Format the path as a file URI
+    file_uri = f"file:///{os.path.abspath(file_path).replace(os.sep, '/')}"
+    print(f"\nGraphe généré : {file_uri}")
+    print("Cliquez sur le lien ci-dessus pour ouvrir le graphe.")
+
+    # Optional: Print a clickable hyperlink if the environment supports it (Jupyter, some enhanced terminals)
+    try:
+        from IPython.display import display, HTML
+        display(HTML(f"<a href='{file_uri}' target='_blank'>Open Graph PDF</a>"))
+    except ImportError:
+        pass  # IPython is not available
 
 # Fonction pour dessiner le graphe de transport avec les composants connexes
 def draw_transport_graph_with_components(graph_data, graph_number, components):
@@ -85,4 +101,10 @@ def draw_transport_graph_with_components(graph_data, graph_number, components):
             if graph_data['propositions'][i][j] > 0:
                 dot.edge(f'F{i+1}', f'C{j+1}', label=str(graph_data['propositions'][i][j]))
 
-    dot.render(f'data/graph/transport_graph_{graph_number}_components', format='pdf', view=True)
+    dot.render(f'data/graph/transport_graph_{graph_number}_components', format='pdf', view=False)
+    file_path = f'data/graph/transport_graph_{graph_number}_components.pdf'
+
+    # Format the path as a file URI
+    file_uri = f"file:///{os.path.abspath(file_path).replace(os.sep, '/')}"
+    print(f"\nGraphe généré : {file_uri}")
+    print("Cliquez sur le lien ci-dessus pour ouvrir le graphe.")
