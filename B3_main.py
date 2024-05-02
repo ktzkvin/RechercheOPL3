@@ -40,9 +40,9 @@ def connexity(graph_data, graph_number):
     save = None
 
     if bfs_connexity(graph_data):
-        print("\nLe réseau de transport est déjà connexe.")
+        print(f"\nLe réseau de transport est {Back.GREEN}{Fore.LIGHTWHITE_EX}déjà connexe{Style.RESET_ALL}.")
     else:
-        print("\nLe réseau de transport n'est pas connexe.")
+        print(f"\nLe réseau de transport {Back.RED}{Fore.LIGHTWHITE_EX}n'est pas connexe{Style.RESET_ALL}.")
 
         # Identifier et afficher les sous-graphes connexes
         components = find_connected_components(graph_data)
@@ -61,7 +61,7 @@ def connexity(graph_data, graph_number):
                 save = (i, j)
                 graph_data['propositions'][i][j] += 1
                 added_edges.append((i, j))
-                print(f"L'arrête P{i + 1}-C{j + 1} a été ajoutée pour améliorer la connexité.")
+                print(f"L'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j + 1}{Style.RESET_ALL} a été ajoutée pour améliorer la connexité.")
 
             else:
                 # Associer chaque tuple de path à un sommet
@@ -201,8 +201,14 @@ def execute_choice(choice, graph_data, graph_number):
         couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
         couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
 
+        display_matrix_2d(couts_potentiel_tab, graph_number,"potentiels")
         display_matrix_2d(couts_marginaux_tab, graph_number,"marginaux")
 
+        # vérification technique marchepied : vérifier si les coûts marginaux sont négatifs
+        i, j = is_marginal_negative(couts_marginaux_tab)
+        if i is not None:
+            print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i+1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
+            marche_pied(graph_data, i, j)
 
     elif choice == 6:
         connexity(graph_data, graph_number)

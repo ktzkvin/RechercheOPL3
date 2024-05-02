@@ -479,7 +479,7 @@ def cout_totaux(graph_data):
                 cost = graph_data['couts'][i][j]
                 proposition = graph_data['propositions'][i][j]
                 total_cost += cost * proposition  # Multiplier le coût par la proposition et ajouter au coût total
-                print(f"Coût de transport de {Fore.LIGHTBLUE_EX}P{i+1}{Style.RESET_ALL} à {Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} : "
+                print(f"Coût de transport de {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL} à {Fore.LIGHTMAGENTA_EX}C{j + 1}{Style.RESET_ALL} : "
                       f"{Fore.LIGHTWHITE_EX}{cost}{Style.RESET_ALL} x {Fore.LIGHTWHITE_EX}{proposition}{Style.RESET_ALL} = "
                       f"{Fore.LIGHTWHITE_EX}{cost * proposition}{Style.RESET_ALL}")
 
@@ -488,3 +488,35 @@ def cout_totaux(graph_data):
     print( "Coûts totaux : " + Back.LIGHTBLUE_EX + Fore.BLACK + f' {total_cost} ' + Style.RESET_ALL)
 
     return total_cost
+
+
+def is_marginal_negative(couts_marginaux):
+    """
+    Vérifie si tous les coûts marginaux sont négatifs.
+    :param couts_marginaux: Tableau des coûts marginaux
+    :return: Le (i, j) du coût marginal le plus négatif
+    """
+    min_value = float('inf')
+    min_pos = None
+    for i, row in enumerate(couts_marginaux):
+        for j, cost in enumerate(row):
+            if cost < min_value:
+                min_value = cost
+                min_pos = (i, j)
+    return min_pos if min_value < 0 else (None, None)
+
+
+def marche_pied(graphe_data, i, j):
+    """
+    Si certains coûts marginaux sont négatifs, choisir l’arête de coût marginal le plus
+    petit (donc la valeur la plus grande dans le sens des négatifs), utiliser le cycle du
+    marche pied pour améliorer la proposition de transport, et répéter le processus
+    donc (i, j) est le coût marginal le plus négatif.
+    Il faut ajouter cette arête au graphes et vérifier la connexité avec
+
+
+    :param graphe_data: Dictionnaire contenant les données du problème de transport
+    :param i: Ligne du coût marginal négatif
+    :param j: Colonne du coût marginal négatif
+    :return:
+    """
