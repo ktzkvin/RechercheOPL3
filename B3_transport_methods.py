@@ -467,46 +467,40 @@ def is_marginal_negative(couts_marginaux):
 
 
 def stepping_stone_method(graph_data, i, j):
-    """
-    Applique la méthode de marche pied pour résoudre le problème de transport.
-    :param graph_data: Dictionnaire contenant les données du problème de transport
-    :param i: (int) Indice de la ligne de la cellule à ajuster
-    :param j: (int) Indice de la colonne de la cellule à ajuster
-    :return: Matrice des propositions de transport
-    """
     propositions = copy.deepcopy(graph_data['propositions'])
 
+    # Trouver le cycle impliquant l'arête (i, j)
     cycle_exists, cycle_path = detect_cycle_with_edge(graph_data, (i, j))
-    cycle_path.append(cycle_path[0])
-    cycle_path = cycle_path[::-1]
     if not cycle_exists:
         print("Aucun cycle trouvé pour l'arête donnée.")
-        return False
-    else:
-        print("Cycle trouvé pour l'arête donnée : ", end="")
-        print(" -> ".join(cycle_path))
+        return propositions
 
-    # Créer un tableau pour stocker les arêtes du cycle, exemple : cycle_path = ['P1', 'C1', 'P2', 'C2'], array_cycle = [(0, 0), (0, 1), (1, 1), (1, 0)]
+    cycle_path.append(cycle_path[0])
+    cycle_path = cycle_path[::-1]
+    print(cycle_path)
+
+    print("Cycle trouvé pour l'arête donnée : ", " -> ".join(cycle_path))
+
     array_cycle = []
     for k in range(len(cycle_path) - 1):
         fournisseur = int(cycle_path[k][1:]) - 1
         client = int(cycle_path[k + 1][1:]) - 1
         array_cycle.append((fournisseur, client))
 
-    # Maximiser la proposition de la cellule (i, j)
-    for array in array_cycle:
-        # Récupérer les indices de la cellule à remplir
-        i, j = array
+    min_quantity = float('inf')
+    for index, (f, c) in enumerate(array_cycle):
+        if index % 2 == 1:  # Choisir les arcs soustractifs
+            min_quantity = min(min_quantity, propositions[f][c])
 
-        # Trouver le minimum entre les commandes et les provisions de la cellule
-        min_value = min(graph_data['provisions'][i], graph_data['commandes'][j])
+    if min_quantity == float('inf') or min_quantity == 0:
+        print("Aucun ajustement possible pour ce cycle.")
+        return propositions
 
-        # Trouver le maximum que je peux remplir par rapport à ce qu'il y a déjà dans la ligne/colonne de la cellule que je veux remplir
-        column = [propositions[k][j] for k in range(len(propositions))]
-        row = [propositions[i][k] for k in range(len(propositions[0]))]
-        max_value = min(min_value, max(graph_data['commandes'][j] - sum(column), graph_data['provisions'][i] - sum(row)))
-
-        # Remplir la cellule de la proposition
-        propositions[i][j] += max_value
+    # Ajuster les quantités selon le cycle
+    for index, (f, c) in enumerate(array_cycle):
+        if index % 2 == 0:
+            propositions[f][c] += min_quantity  # Ajouter à l'arc additif
+        else:
+            propositions[f][c] -= min_quantity  # Soustraire de l'arc soustractif
 
     return propositions

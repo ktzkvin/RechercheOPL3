@@ -206,12 +206,14 @@ def execute_choice(choice, graph_data, graph_number):
 
         # vérification technique marchepied : vérifier si les coûts marginaux sont négatifs
         i, j = is_marginal_negative(couts_marginaux_tab)
+        k = 0
         while i is not None:
-            print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i+1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
-            print(graph_data['propositions'])
+            print(f" --------------------------------- {k} --------------------------------- ")
+            print(i, j)
+            print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
             graph_data['propositions'] = stepping_stone_method(graph_data, i, j)
-            print(graph_data['propositions'])
-            # Afficher le tableau final
+
+            # Afficher le tableau de nouvelle proposition de transport
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
             display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'],
                                      graph_data['commandes'], graph_data['propositions'], graph_number)
@@ -224,10 +226,12 @@ def execute_choice(choice, graph_data, graph_number):
             display_matrix_2d(couts_marginaux_tab, graph_number, "marginaux")
 
             i, j = is_marginal_negative(couts_marginaux_tab)
+            print(i, j)
 
             # pause pour continuer ou non
             if not continue_prompt():
                 break
+            k += 1
 
     elif choice == 6:
         connexity(graph_data, graph_number)
