@@ -492,7 +492,19 @@ def stepping_stone_method(graph_data, i, j):
         client = int(cycle_path[k + 1][1:]) - 1
         array_cycle.append((fournisseur, client))
 
+    # Maximiser la proposition de la cellule (i, j)
+    for array in array_cycle:
+        i, j = array
 
+        # Trouver le minimum entre les commandes et les provisions de la cellule
+        min_value = min(graph_data['provisions'][i], graph_data['commandes'][j])
 
+        # Trouver le maximum que je peux remplir par rapport à ce qu'il y a déjà dans la ligne/colonne de la cellule que je veux remplir
+        column = [propositions[k][j] for k in range(len(propositions))]
+        row = [propositions[i][k] for k in range(len(propositions[0]))]
+        max_value = min(min_value, max(graph_data['commandes'][j] - sum(column), graph_data['provisions'][i] - sum(row)))
+
+        # Remplir la cellule de la proposition
+        propositions[i][j] += max_value
 
     return propositions
