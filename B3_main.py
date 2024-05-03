@@ -26,7 +26,7 @@ def connexity(graph_data, graph_number):
 
     # Méthode de Balas-Hammer
     elif algo_choice == 2:
-        graph_data['propositions'] = balas_hammer_method(graph_data)
+        graph_data['propositions'] = balas_hammer_method(graph_data, True)
         method = "Balas-Hammer"
 
     print(
@@ -139,7 +139,7 @@ def main_menu(graph_data, graph_number):
 
 
         # Choix du menu
-        elif choice in [1, 2, 3, 4, 5, 6, 7, 8, 10]:
+        elif choice in [1, 2, 3, 4, 5, 6, 7, 8]:
 
             added_edges = execute_choice(choice, graph_data, graph_number, added_edges)
 
@@ -186,7 +186,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
 
         # Méthode de Balas-Hammer
         elif algo_choice == 2:
-            graph_data['propositions'] = balas_hammer_method(graph_data)
+            graph_data['propositions'] = balas_hammer_method(graph_data, True)
 
         else:
             print("Choix invalide. Veuillez entrer 1 ou 2 pour sélectionner l'algorithme.")
@@ -300,9 +300,6 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
         draw_transport_graph(graph_data, graph_number, added_edges)
 
-    elif choice == 10:
-        tab_test = create_random_matrix(2, 3)
-        display_matrix_transport(tab_test, 0)
 
 
 # Fonction pour changer la table de contraintes
@@ -327,7 +324,8 @@ if __name__ == "__main__":
     while True:
         print("\n╔═══════════════════ " + Fore.LIGHTWHITE_EX + "Projet Graphe : B3" + Fore.RESET + " ═══════════════════╗")
         try:
-            graph_number = int(input("\n" + Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Entrez le numéro de la table de contraintes " + Fore.YELLOW + "" + Fore.LIGHTBLUE_EX + "(1-12)" + Fore.RESET + " : "))
+            graph_number = int(input("\n" + Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Entrez le numéro de la table de contraintes " + Fore.YELLOW + "" + Fore.LIGHTBLUE_EX + "(1-12)" + Fore.RESET + " : " +
+                                     "\n" + Fore.LIGHTYELLOW_EX + "  ✦" + Style.RESET_ALL + " Ou bien entrez " + Fore.YELLOW + "" + Fore.LIGHTYELLOW_EX + "0" + Fore.RESET + " pour lancer la simulation de complexité : "))
             if 1 <= graph_number <= 12:
                 graph_data = load_graph_data(graph_number)
 
@@ -340,8 +338,7 @@ if __name__ == "__main__":
                 main_menu(graph_data, graph_number)
                 break  # Sortir de la boucle si une entrée valide est fournie
             elif graph_number == 0:
-                print(Fore.RED + "\n✧" + Fore.RESET + " Programme quitté. " + Fore.RED + "✧\n" + Fore.RESET)
-                break  # Sortir de la boucle
+                complex_analys()
             else:
                 print(Fore.RED + "\n  ⚠" + Fore.RESET + " Veuillez entrer un chiffre entre 1 et 12.\n")
         except ValueError as e:

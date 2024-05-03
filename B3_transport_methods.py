@@ -49,7 +49,7 @@ def nord_ouest_method(graph_data):
 
 
 # Fonction pour appliquer la méthode de Balas-Hammer
-def balas_hammer_method(graph_data):
+def balas_hammer_method(graph_data, go=None):
     """
     Applique la méthode de Balas-Hammer pour résoudre le problème de transport.
     :param graph_data: Dictionnaire contenant les données du problème de transport
@@ -106,11 +106,12 @@ def balas_hammer_method(graph_data):
                         min_cost = costs[i][index]
                         chosen_i, chosen_j = i, index
 
-        # Affichage de l'arête choisie avec toutes les informations nécessaires
-        print(
-            f"\n\nArête choisie pour remplissage : {Fore.LIGHTBLUE_EX}P{chosen_i + 1}{Style.RESET_ALL} - {Fore.LIGHTMAGENTA_EX}C{chosen_j + 1}{Style.RESET_ALL}")
-        print(f"Coût minimal trouvé : {Fore.LIGHTWHITE_EX}{min_cost}{Style.RESET_ALL}")
-        print(f"Quantité remplie : {Back.WHITE}{Fore.BLACK}{min(provisions[chosen_i], commandes[chosen_j])}{Style.RESET_ALL}")
+        if go:
+            # Affichage de l'arête choisie avec toutes les informations nécessaires
+            print(
+                f"\n\nArête choisie pour remplissage : {Fore.LIGHTBLUE_EX}P{chosen_i + 1}{Style.RESET_ALL} - {Fore.LIGHTMAGENTA_EX}C{chosen_j + 1}{Style.RESET_ALL}")
+            print(f"Coût minimal trouvé : {Fore.LIGHTWHITE_EX}{min_cost}{Style.RESET_ALL}")
+            print(f"Quantité remplie : {Back.WHITE}{Fore.BLACK}{min(provisions[chosen_i], commandes[chosen_j])}{Style.RESET_ALL}")
 
         # Maximisation de la cellule choisie
         quantity = min(provisions[chosen_i], commandes[chosen_j])
@@ -127,20 +128,21 @@ def balas_hammer_method(graph_data):
             for k in range(fournisseurs):
                 costs[k][chosen_j] = float('inf')
 
-        print("----------------------------------------------")
-        print("\nPénalités pour les lignes :")
-        for i, delta in enumerate(delta_rows):
-            if delta == -float('inf'):
-                print(f"P{i + 1} : /")
-            else:
-                print(f"P{i + 1} : {delta}")
+        if go:
+            print("----------------------------------------------")
+            print("\nPénalités pour les lignes :")
+            for i, delta in enumerate(delta_rows):
+                if delta == -float('inf'):
+                    print(f"P{i + 1} : /")
+                else:
+                    print(f"P{i + 1} : {delta}")
 
-        print("\nPénalités pour les colonnes :")
-        for j, delta in enumerate(delta_cols):
-            if delta == -float('inf'):
-                print(f"C{j + 1} : /")
-            else:
-                print(f"C{j + 1} : {delta}")
+            print("\nPénalités pour les colonnes :")
+            for j, delta in enumerate(delta_cols):
+                if delta == -float('inf'):
+                    print(f"C{j + 1} : /")
+                else:
+                    print(f"C{j + 1} : {delta}")
 
     return propositions
 
