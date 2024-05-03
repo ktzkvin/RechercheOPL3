@@ -200,7 +200,7 @@ def vertex_to_label(index, num_providers):
 
 
 # Fonction pour vérifier si un chemin existe entre deux sommets dans le graphe
-def path_exists(graph_data, start, end, visited):
+def path_exists(graph_data, start, end, visited, added_edges):
     """
     Vérifie s'il existe un chemin entre deux sommets dans le graphe et retourne ce chemin s'il existe.
     :param graph_data: Dictionnaire contenant les données du graphe
@@ -374,21 +374,16 @@ def detect_cycle_with_edge(graph_data, edge, added_edges=None):
     :param edge: Sommets de l'arête à vérifier
     :return: True si un cycle est créé, False sinon
     """
+    print(added_edges)
     # Initialisation
     total_vertices = sum(graph_data['taille'])
     visited = [False] * total_vertices
-
-    # Ajouter les arêtes de added_edges à visited
-    if added_edges:
-        for added_edge in added_edges:
-            visited[added_edge[0]] = True
-            visited[added_edge[1]] = True
 
     # Convertir l'arête dans les index de la liste visited
     edge_indices = (edge[0], edge[1] + graph_data['taille'][0])
 
     # Vérifier si un chemin existe déjà entre les deux sommets de l'arête améliorante
-    valid, path = path_exists(graph_data, edge_indices[0], edge_indices[1], visited)
+    valid, path = path_exists(graph_data, edge_indices[0], edge_indices[1], visited, added_edges)
     if valid:
         # Si un chemin existe, l'ajout de cette arête créerait un cycle
         return True, path

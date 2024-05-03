@@ -37,7 +37,6 @@ def connexity(graph_data, graph_number):
 
     added_edges = []
     ignored_edges = set()
-    save = None
 
     if bfs_connexity(graph_data):
         print(f"\nLe réseau de transport est {Back.GREEN}{Fore.LIGHTWHITE_EX}déjà connexe{Style.RESET_ALL}.")
@@ -56,9 +55,8 @@ def connexity(graph_data, graph_number):
                 break
             i, j = combinaison_minimale
 
-            is_cycle, path = detect_cycle_with_edge(graph_data, (i, j))
+            is_cycle, path = detect_cycle_with_edge(graph_data, (i, j), added_edges)
             if not is_cycle:
-                save = (i, j)
                 graph_data['propositions'][i][j] += 1
                 added_edges.append((i, j))
                 print(f"L'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j + 1}{Style.RESET_ALL} a été ajoutée pour améliorer la connexité.")
