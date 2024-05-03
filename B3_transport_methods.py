@@ -487,18 +487,24 @@ def stepping_stone_method(graph_data, i, j):
         print("Cycle trouvé pour l'arête donnée : ", end="")
         print(" -> ".join(cycle_path))
 
-    # Créer un tableau pour stocker les arêtes du cycle, exemple : cycle_path = ['P1', 'C1', 'P2', 'C2'], array_cycle = [(0, 0), (0, 1), (1, 1), (1, 0)]
+    # Créer un tableau pour stocker les arêtes du cycle, exemple : cycle_path = ['P1', 'C1', 'P2', 'C2'], donc cycle = P1 -> C1 -> P2 -> C2, donc array_cycle doit avoir [(P1, C1), (P2, C1), (P2, C2), (P1, C2)] mais avec des indices
     array_cycle = []
     for k in range(len(cycle_path) - 1):
         fournisseur = int(cycle_path[k][1:]) - 1
         client = int(cycle_path[k + 1][1:]) - 1
         array_cycle.append((fournisseur, client))
 
+    # dans array_cycle, changer 1 fois sur 2 les indices de i et j en commençant par l'indice 1 (0-indexed)
+    # par exemple [(1, 2), (3, 4), (5, 6), (7, 8)] devient [(1, 2), (4, 3), (5, 6), (8, 7)]
+    for k in range(1, len(array_cycle), 2):
+        array_cycle[k] = array_cycle[k][::-1]
 
     # Mettre à 0 les propositions des arêtes du cycle array_cycle
     for array in array_cycle:
+        print(f"Arête à mettre à zéro : P{array[0] + 1}C{array[1] + 1}")
         i, j = array
         propositions[i][j] = 0
+    print(f"Propositions après mise à zéro des arêtes du cycle : {propositions}")
 
     # Maximiser la proposition de la cellule (i, j)
     for array in array_cycle:
@@ -529,19 +535,22 @@ def stepping_stone_method(graph_data, i, j):
         print(f"Liste addition : {liste_addition}")
         liste_provisions_commandes = [graph_data['provisions'][i], graph_data['commandes'][j]]
         liste_provisions_commandes.sort(reverse=True)
+        quit = False
         for value in liste_addition:
             print(f"    val : {value}")
             for val_liste in liste_provisions_commandes:
-                print(
-                    f"    provisions : {graph_data['provisions'][i]}, commandes : {graph_data['commandes'][j]}, valeur prise : {val_liste}")
+                print(f"    provisions : {graph_data['provisions'][i]}, commandes : {graph_data['commandes'][j]}, valeur prise : {val_liste}")
                 result = val_liste - value
                 print(f"    détail : {val_liste} - {value} = {result}")
                 if (result + addition_ligne) <= graph_data['provisions'][i] and (result + addition_colonne) <= graph_data['commandes'][j]:
                     print(f"    La valeur {result} est possible pour la cellule ({i+1}, {j+1})")
+                    quit = True
                     break
+
                 else:
                     print(f"    {Fore.RED}Ne marche pas :{Style.RESET_ALL} {result} + {addition_ligne} => {graph_data['provisions'][i]} et {result} + {addition_colonne} => {graph_data['commandes'][j]}")
-
+            if quit:
+                break
         propositions[i][j] = result
         graph_data['propositions'][i][j] = result
 
