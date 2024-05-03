@@ -367,7 +367,7 @@ def rendre_graphe_connexe(graph_data):
 
 
 # Fonction pour détecter un cycle dans le graphe
-def detect_cycle_with_edge(graph_data, edge):
+def detect_cycle_with_edge(graph_data, edge, added_edges=None):
     """
     Vérifie si l'ajout d'une arête créerait un cycle dans le graphe.
     :param graph_data: Dictionnaire contenant les données du graphe
@@ -377,6 +377,12 @@ def detect_cycle_with_edge(graph_data, edge):
     # Initialisation
     total_vertices = sum(graph_data['taille'])
     visited = [False] * total_vertices
+
+    # Ajouter les arêtes de added_edges à visited
+    if added_edges:
+        for added_edge in added_edges:
+            visited[added_edge[0]] = True
+            visited[added_edge[1]] = True
 
     # Convertir l'arête dans les index de la liste visited
     edge_indices = (edge[0], edge[1] + graph_data['taille'][0])
@@ -477,7 +483,7 @@ def is_marginal_negative(couts_marginaux):
     return min_pos if min_value < 0 else (None, None)
 
 
-def stepping_stone_method(graph_data, i, j):
+def stepping_stone_method(graph_data, i, j, added_edges):
     """
     Applique la méthode de marche pied pour résoudre le problème de transport.
     :param graph_data: Dictionnaire contenant les données du problème de transport
@@ -487,7 +493,7 @@ def stepping_stone_method(graph_data, i, j):
     """
     propositions = copy.deepcopy(graph_data['propositions'])
 
-    cycle_exists, cycle_path = detect_cycle_with_edge(graph_data, (i, j))
+    cycle_exists, cycle_path = detect_cycle_with_edge(graph_data, (i, j), added_edges)
 
     if not cycle_exists:
         print("Aucun cycle trouvé pour l'arête donnée.")

@@ -51,7 +51,7 @@ def load_graph_data(graph_number):
 
 
 # Fonction pour afficher les données du problème de transport sous forme de tableau
-def display_matrix_transport(taille, couts, provisions, commandes, propositions, graph_number):
+def display_matrix_transport(taille, couts, provisions, commandes, propositions, graph_number, added_edges=None):
     """
     Affiche les données du problème de transport sous forme de tableau.
     :param taille: Tuple (nombre de fournisseurs, nombre de clients)
@@ -77,7 +77,7 @@ def display_matrix_transport(taille, couts, provisions, commandes, propositions,
     for i in range(taille[0]):
         row = [Style.BRIGHT + f"P{i + 1}" + Style.RESET_ALL] + [Fore.LIGHTBLUE_EX + str(cout) + Style.RESET_ALL + " | " for cout in couts[i]]
         for j in range(taille[1]):
-            row[j + 1] += Fore.LIGHTWHITE_EX + str(propositions[i][j]) + Style.RESET_ALL
+                row[j + 1] += Fore.LIGHTWHITE_EX + str(propositions[i][j]) + Style.RESET_ALL
 
         row.append(str(provisions[i]) + Style.RESET_ALL)
         table.append(row)

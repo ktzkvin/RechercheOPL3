@@ -69,8 +69,11 @@ def connexity(graph_data, graph_number):
                 ignored_edges.add((i, j))
 
         print("\nLe réseau de transport est maintenant connexe.")
-    if save and (i, j) in save:
-        graph_data['propositions'][save[0]][save[1]] = 0
+
+    # remettre toutes les propositions de added_edges à 0
+    for edge in added_edges:
+        graph_data['propositions'][edge[0]][edge[1]] = 0
+
     draw_transport_graph(graph_data, graph_number, added_edges)
     return added_edges
 
@@ -227,7 +230,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         while i is not None:
             print(f" --------------------------------- Itération : {k} --------------------------------- ")
             print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
-            graph_data['propositions'] = stepping_stone_method(graph_data, i, j)
+            graph_data['propositions'] = stepping_stone_method(graph_data, i, j, added_edges)
 
             # Afficher le tableau de nouvelle proposition de transport
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
@@ -269,13 +272,12 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
             print(f" --------------------------------- Itération : {k} --------------------------------- ")
             print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
 
-            graph_data['propositions'] = stepping_stone_method(graph_data, i, j)
-            print(graph_data)
+            graph_data['propositions'] = stepping_stone_method(graph_data, i, j, added_edges)
 
             # Afficher le tableau de nouvelle proposition de transport
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
             display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'],
-                                     graph_data['commandes'], graph_data['propositions'], graph_number)
+                                     graph_data['commandes'], graph_data['propositions'], graph_number, added_edges)
 
             potentiel = calcul_potentiels(graph_data)
             couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
