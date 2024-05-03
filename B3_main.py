@@ -1,5 +1,6 @@
 from B3_data import *
 from B3_draw import *
+from B3_complexity import *
 from B3_transport_methods import *
 from colorama import Fore, Back, Style, init
 
@@ -31,9 +32,7 @@ def connexity(graph_data, graph_number):
     print(
         "\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + f"Affichage des potentiels avec {method}" + Fore.RESET + " ─────────── ✦")
 
-    display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'],
-                             graph_data['commandes'],
-                             graph_data['propositions'], graph_number)
+    display_matrix_transport(graph_data, graph_number)
 
     added_edges = []
     ignored_edges = set()
@@ -140,7 +139,7 @@ def main_menu(graph_data, graph_number):
 
 
         # Choix du menu
-        elif choice in [1, 2, 3, 4, 5, 6, 7, 8]:
+        elif choice in [1, 2, 3, 4, 5, 6, 7, 8, 10]:
 
             added_edges = execute_choice(choice, graph_data, graph_number, added_edges)
 
@@ -192,7 +191,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         else:
             print("Choix invalide. Veuillez entrer 1 ou 2 pour sélectionner l'algorithme.")
 
-        display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
+        display_matrix_transport(graph_data, graph_number)
 
     elif choice == 3:
         added_edges = connexity(graph_data, graph_number)
@@ -232,8 +231,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
 
             # Afficher le tableau de nouvelle proposition de transport
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
-            display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'],
-                                     graph_data['commandes'], graph_data['propositions'], graph_number)
+            display_matrix_transport(graph_data, graph_number)
 
             potentiel = calcul_potentiels(graph_data)
             couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
@@ -274,8 +272,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
 
             # Afficher le tableau de nouvelle proposition de transport
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
-            display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'],
-                                     graph_data['commandes'], graph_data['propositions'], graph_number, added_edges)
+            display_matrix_transport(graph_data, graph_number, added_edges)
 
             potentiel = calcul_potentiels(graph_data)
             couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
@@ -302,6 +299,10 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
         draw_transport_graph(graph_data, graph_number, added_edges)
+
+    elif choice == 10:
+        tab_test = create_random_matrix(2, 3)
+        display_matrix_transport(tab_test, 0)
 
 
 # Fonction pour changer la table de contraintes

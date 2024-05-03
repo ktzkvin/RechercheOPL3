@@ -51,7 +51,7 @@ def load_graph_data(graph_number):
 
 
 # Fonction pour afficher les données du problème de transport sous forme de tableau
-def display_matrix_transport(taille, couts, provisions, commandes, propositions, graph_number, added_edges=None):
+def display_matrix_transport(graph_data, graph_number):
     """
     Affiche les données du problème de transport sous forme de tableau.
     :param taille: Tuple (nombre de fournisseurs, nombre de clients)
@@ -62,6 +62,13 @@ def display_matrix_transport(taille, couts, provisions, commandes, propositions,
     :param graph_number: Numéro de la table de contraintes
     :return: None
     """
+    # Initialisation
+    taille = graph_data["taille"]
+    couts = graph_data["couts"]
+    provisions = graph_data["provisions"]
+    commandes = graph_data["commandes"]
+    propositions = graph_data["propositions"]
+
     # Calculer la somme des valeurs de provisions
     somme_provisions = sum(provisions)
 
