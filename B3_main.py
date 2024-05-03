@@ -86,6 +86,19 @@ def continue_prompt():
             print(Fore.RED + "Choix invalide, veuillez entrer 'y' pour oui ou 'n' pour non." + Fore.RESET)
 
 
+# Fonction pour mettre en pause pour les coûts marginaux (demande pour continuer ou non)
+def continue_prompt_marg():
+    while True:  # Boucle jusqu'à ce que l'utilisateur donne une réponse valide
+        user_input = input("\n" + Fore.RED + "Un valeur des coûts marginaux a de nouveau été détectée négative, refaire une itération ? "+ Fore.BLUE + "[" + Fore.GREEN + "y" + Fore.LIGHTBLUE_EX + "/" + Fore.RED + "n" + Fore.LIGHTBLUE_EX + "] " + Style.RESET_ALL).lower()
+        if user_input == 'y':
+            return True
+        elif user_input == 'n':
+            return False
+        else:
+            print(Fore.RED + "Choix invalide, veuillez entrer 'y' pour oui ou 'n' pour non." + Fore.RESET)
+
+
+
 # Menu principal
 def main_menu(graph_data, graph_number):
     continue_running = True
@@ -208,7 +221,7 @@ def execute_choice(choice, graph_data, graph_number):
         i, j = is_marginal_negative(couts_marginaux_tab)
         k = 0
         while i is not None:
-            print(f" --------------------------------- {k} --------------------------------- ")
+            print(f" --------------------------------- Itération : {k} --------------------------------- ")
             print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
             graph_data['propositions'] = stepping_stone_method(graph_data, i, j)
 
@@ -227,14 +240,46 @@ def execute_choice(choice, graph_data, graph_number):
             i, j = is_marginal_negative(couts_marginaux_tab)
 
             # pause pour continuer ou non
-            if not continue_prompt():
+            if i is not None and not continue_prompt_marg():
                 break
             k += 1
 
     elif choice == 6:
         connexity(graph_data, graph_number)
 
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
+
+        potentiel = calcul_potentiels(graph_data)
+        couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
+        couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
+
+        display_matrix_2d(couts_potentiel_tab, graph_number,"potentiels")
+        display_matrix_2d(couts_marginaux_tab, graph_number,"marginaux")
+
+        # vérification technique marchepied : vérifier si les coûts marginaux sont négatifs
+        i, j = is_marginal_negative(couts_marginaux_tab)
+        k = 0
+        while i is not None:
+            print(f" --------------------------------- Itération : {k} --------------------------------- ")
+            print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
+            graph_data['propositions'] = stepping_stone_method(graph_data, i, j)
+
+            # Afficher le tableau de nouvelle proposition de transport
+            print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
+            display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'],
+                                     graph_data['commandes'], graph_data['propositions'], graph_number)
+
+            potentiel = calcul_potentiels(graph_data)
+            couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
+            couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
+
+            display_matrix_2d(couts_potentiel_tab, graph_number, "potentiels")
+            display_matrix_2d(couts_marginaux_tab, graph_number, "marginaux")
+
+            i, j = is_marginal_negative(couts_marginaux_tab)
+
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Coûts totaux" + Fore.RESET + " ─────────── ✦")
+
         cout_totaux(graph_data)
 
     elif choice == 8:

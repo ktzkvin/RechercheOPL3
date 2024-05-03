@@ -184,11 +184,21 @@ def bfs_connexity(graph_data):
 
     return all(visited)  # Le graphe est connexe si tous les sommets ont été visités
 
+
+# Fonction pour convertir l'index d'un sommet en son label
 def vertex_to_label(index, num_providers):
+    """
+    Convertir l'index d'un sommet en son label correspondant.
+    :param index: Index du sommet
+    :param num_providers: Nombre de fournisseurs
+    :return: Label du sommet
+    """
     if index < num_providers:
         return f'P{index + 1}'
     else:
         return f'C{index - num_providers + 1}'
+
+
 # Fonction pour vérifier si un chemin existe entre deux sommets dans le graphe
 def path_exists(graph_data, start, end, visited):
     """
@@ -501,10 +511,8 @@ def stepping_stone_method(graph_data, i, j):
 
     # Mettre à 0 les propositions des arêtes du cycle array_cycle
     for array in array_cycle:
-        print(f"Arête à mettre à zéro : P{array[0] + 1}C{array[1] + 1}")
         i, j = array
         propositions[i][j] = 0
-    print(f"Propositions après mise à zéro des arêtes du cycle : {propositions}")
 
     # Maximiser la proposition de la cellule (i, j)
     for array in array_cycle:
@@ -524,31 +532,19 @@ def stepping_stone_method(graph_data, i, j):
         si oui, on peut remplir la cellule avec cette valeur
         sinon, on passe au second de la liste_addition et on refait le test
         """
-        print("\n")
-        print(f"{Fore.LIGHTBLUE_EX}Cellule à remplir : ({i + 1}, {j + 1}){Style.RESET_ALL}")
-        print(f"ligne : {row}")
-        print(f"colonne : {column}")
         addition_ligne = sum(row)
         addition_colonne = sum(column)
         liste_addition = [addition_ligne, addition_colonne]
         liste_addition.sort()
-        print(f"Liste addition : {liste_addition}")
         liste_provisions_commandes = [graph_data['provisions'][i], graph_data['commandes'][j]]
         liste_provisions_commandes.sort(reverse=True)
         quit = False
         for value in liste_addition:
-            print(f"    val : {value}")
             for val_liste in liste_provisions_commandes:
-                print(f"    provisions : {graph_data['provisions'][i]}, commandes : {graph_data['commandes'][j]}, valeur prise : {val_liste}")
                 result = val_liste - value
-                print(f"    détail : {val_liste} - {value} = {result}")
                 if (result + addition_ligne) <= graph_data['provisions'][i] and (result + addition_colonne) <= graph_data['commandes'][j]:
-                    print(f"    La valeur {result} est possible pour la cellule ({i+1}, {j+1})")
                     quit = True
                     break
-
-                else:
-                    print(f"    {Fore.RED}Ne marche pas :{Style.RESET_ALL} {result} + {addition_ligne} => {graph_data['provisions'][i]} et {result} + {addition_colonne} => {graph_data['commandes'][j]}")
             if quit:
                 break
         propositions[i][j] = result
