@@ -72,6 +72,7 @@ def connexity(graph_data, graph_number):
     if save and (i, j) in save:
         graph_data['propositions'][save[0]][save[1]] = 0
     draw_transport_graph(graph_data, graph_number, added_edges)
+    return added_edges
 
 
 # Fonction pour mettre en pause (demande pour continuer ou non)
@@ -102,6 +103,7 @@ def continue_prompt_marg():
 # Menu principal
 def main_menu(graph_data, graph_number):
     continue_running = True
+    added_edges = []
     while continue_running:
         print("\n\n╠═════════════════════ " + Fore.LIGHTWHITE_EX + "Menu Principal" + Fore.RESET + " ═════════════════════╣\n")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "1." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Matrice des coûts")
@@ -139,7 +141,7 @@ def main_menu(graph_data, graph_number):
         # Choix du menu
         elif choice in [1, 2, 3, 4, 5, 6, 7, 8]:
 
-            execute_choice(choice, graph_data, graph_number)
+            added_edges = execute_choice(choice, graph_data, graph_number, added_edges)
 
             # Ajout de la demande pour continuer ou quitter le programme
             if not continue_prompt():
@@ -161,8 +163,7 @@ def main_menu(graph_data, graph_number):
 
 
 # Fonction d'exécution du choix de menu
-def execute_choice(choice, graph_data, graph_number):
-
+def execute_choice(choice, graph_data, graph_number, added_edges):
     if choice == 1:
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Matrice des coûts" + Fore.RESET + " ─────────── ✦")
@@ -193,10 +194,11 @@ def execute_choice(choice, graph_data, graph_number):
         display_matrix_transport(graph_data['taille'], graph_data['couts'], graph_data['provisions'], graph_data['commandes'], graph_data['propositions'], graph_number)
 
     elif choice == 3:
-        connexity(graph_data, graph_number)
+        added_edges = connexity(graph_data, graph_number)
+        return added_edges
 
     elif choice == 4:
-        connexity(graph_data, graph_number)
+        added_edges = connexity(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts potentiels" + Fore.RESET + " ─────────── ✦")
 
@@ -205,8 +207,10 @@ def execute_choice(choice, graph_data, graph_number):
         couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
         display_matrix_2d(couts_potentiel_tab, graph_number,"potentiels")
 
+        return added_edges
+
     elif choice == 5:
-        connexity(graph_data, graph_number)
+        added_edges = connexity(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
 
@@ -243,9 +247,11 @@ def execute_choice(choice, graph_data, graph_number):
             if i is not None and not continue_prompt_marg():
                 break
             k += 1
+        return added_edges
 
     elif choice == 6:
-        connexity(graph_data, graph_number)
+        added_edges = connexity(graph_data, graph_number)
+        draw_transport_graph(graph_data, graph_number, added_edges)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
 
@@ -262,7 +268,9 @@ def execute_choice(choice, graph_data, graph_number):
         while i is not None:
             print(f" --------------------------------- Itération : {k} --------------------------------- ")
             print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
+
             graph_data['propositions'] = stepping_stone_method(graph_data, i, j)
+            print(graph_data)
 
             # Afficher le tableau de nouvelle proposition de transport
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
@@ -278,15 +286,22 @@ def execute_choice(choice, graph_data, graph_number):
 
             i, j = is_marginal_negative(couts_marginaux_tab)
 
+            draw_transport_graph(graph_data, graph_number, added_edges)
+
+            # pause pour continuer ou non
+            if i is not None and not continue_prompt_marg():
+                break
+            k += 1
+
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Coûts totaux" + Fore.RESET + " ─────────── ✦")
 
         cout_totaux(graph_data)
+        return added_edges
 
     elif choice == 8:
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Représentation du graphe" + Fore.RESET + " ─────────── ✦")
-
-        draw_transport_graph(graph_data, graph_number)
+        draw_transport_graph(graph_data, graph_number, added_edges)
 
 
 # Fonction pour changer la table de contraintes

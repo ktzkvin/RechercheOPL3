@@ -4,7 +4,8 @@ from graphviz import Digraph
 
 
 # Fonction pour dessiner le graphe de transport
-def draw_transport_graph(graph_data, graph_number, added_edges=None):
+def draw_transport_graph(graph_data, graph_number, added_edges):
+    print(added_edges)
     """
     Dessiner le graphe de transport avec les propositions de transport
     :param graph_data: informations sur le graphe

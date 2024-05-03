@@ -473,6 +473,7 @@ def is_marginal_negative(couts_marginaux):
             if cost < min_value:
                 min_value = cost
                 min_pos = (i, j)
+    print(f"Coût marginal le plus négatif : {min_value} pour la cellule {Fore.LIGHTBLUE_EX}P{min_pos[0] + 1}{Style.RESET_ALL} - {Fore.LIGHTMAGENTA_EX}C{min_pos[1] + 1}{Style.RESET_ALL}")
     return min_pos if min_value < 0 else (None, None)
 
 
@@ -490,7 +491,7 @@ def stepping_stone_method(graph_data, i, j):
 
     if not cycle_exists:
         print("Aucun cycle trouvé pour l'arête donnée.")
-        return False
+        return graph_data['propositions']
     else:
         cycle_path.append(cycle_path[0])
         cycle_path = cycle_path[::-1]
