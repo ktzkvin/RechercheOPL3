@@ -298,6 +298,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
 
         print("\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
 
+        new_potentiel = None
         potentiel = calcul_potentiels(graph_data, added_edges)
         couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
         couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
@@ -311,7 +312,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         while i is not None:
             k += 1
             print(f"\n --------------------------------- Itération : {k} --------------------------------- \n")
-            print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
+            print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j + 1}{Style.RESET_ALL} est négatif.")
 
             # revérifier si connexe, si c'est non, relancer is_connex
             if not bfs_connexity(graph_data):
@@ -333,9 +334,9 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
             i, j = is_marginal_negative(couts_marginaux_tab)
 
             # pause pour continuer ou non
-            if i is not None and not continue_prompt_marg():
+            if (i is not None and not continue_prompt_marg()) or new_potentiel == potentiel:
                 break
-
+            potentiel = new_potentiel
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Coûts totaux" + Fore.RESET + " ─────────── ✦")
 
         cout_totaux(graph_data)
