@@ -6,7 +6,6 @@ from B3_transport_methods import *
 from tqdm import tqdm
 
 
-
 def create_random_matrix(n, m):
     """
     Crée une matrice de données aléatoires pour le problème de transport.

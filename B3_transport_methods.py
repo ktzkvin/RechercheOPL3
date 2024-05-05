@@ -209,14 +209,10 @@ def path_exists(graph_data, start, end, visited, added_edges):
     :param start: Sommet de départ
     :param end: Sommet d'arrivée
     :param visited: Liste des sommets visités
+    :param added_edges: Liste des arêtes ajoutées [(fournisseur, client)]
     :return: Tuple (bool, list) - (True si un chemin existe, False sinon, chemin suivi si existant)
     """
-    # Utiliser une file pour le parcours en largeur (BFS)
-    #retourner un tuple (bool, list) - (True si un chemin existe, False sinon, chemin suivi si existant)
-    # le chemin est une liste [] nommée path qui contiendrait les sommets visités, par exemple path = [9, 14, 10, 7...]
-
     queue = deque([start])
-    # Dictionnaire pour garder une trace des prédécesseurs de chaque sommet
     predecessors = {start: None}
     visited[start] = True
 
@@ -229,10 +225,10 @@ def path_exists(graph_data, start, end, visited, added_edges):
             while step is not None:
                 path.append(vertex_to_label(step, graph_data['taille'][0]))
                 step = predecessors[step]
-            path.reverse()  # Le chemin est construit à l'envers, donc on le retourne
+            path.reverse()
             return True, path
 
-        # Explorer les voisins
+        # Explorer les voisins normaux (fournisseurs -> clients et clients -> fournisseurs)
         if vertex < graph_data['taille'][0]:  # Fournisseurs
             for j in range(graph_data['taille'][1]):
                 neighbor = graph_data['taille'][0] + j
@@ -247,6 +243,19 @@ def path_exists(graph_data, start, end, visited, added_edges):
                     visited[i] = True
                     queue.append(i)
                     predecessors[i] = vertex
+
+        # Explorer les arêtes ajoutées
+        for supplier_idx, client_idx in added_edges:
+            supplier_vertex = supplier_idx
+            client_vertex = graph_data['taille'][0] + client_idx
+            if vertex == supplier_vertex and not visited[client_vertex]:
+                visited[client_vertex] = True
+                queue.append(client_vertex)
+                predecessors[client_vertex] = vertex
+            elif vertex == client_vertex and not visited[supplier_vertex]:
+                visited[supplier_vertex] = True
+                queue.append(supplier_vertex)
+                predecessors[supplier_vertex] = vertex
 
     return False, []
 
@@ -296,18 +305,30 @@ def find_connected_components(graph_data):
     return components
 
 
-def calcul_potentiels(graph_data):
-    potentiels = {'P1': 0}  # Initialisation avec le potentiel du premier fournisseur
-    changes = True  # Pour suivre s'il y a eu des modifications
+def calcul_potentiels(graph_data, added_edges):
+    """
+    Calcule les potentiels en utilisant les arcs actifs et les arcs ajoutés pour assurer la connexité.
+    Affiche les détails des calculs étape par étape.
+    :param graph_data: Dictionnaire contenant les données du graphe
+    :param added_edges: Liste des arêtes ajoutées [(fournisseur, client)]
+    :return: Dictionnaire des potentiels
+    """
+    # Initialiser les potentiels : commencer par un fournisseur de référence
+    potentiels = {'P1': 0}
+    changes = True
 
     while changes:
-        changes = False  # Réinitialiser le drapeau de changement pour cette itération
+        changes = False
+
+        # Parcourir tous les arcs actifs (propositions > 0)
         for i, row in enumerate(graph_data['couts']):
             for j, cout in enumerate(row):
+                Pi = f"P{i + 1}"
+                Cj = f"C{j + 1}"
                 proposition = graph_data['propositions'][i][j]
-                if proposition != 0:  # Seulement les arêtes utilisées
-                    Pi = f"P{i + 1}"
-                    Cj = f"C{j + 1}"
+
+                if proposition > 0:  # Arc actif uniquement
+                    print(f"\nCalcul du potentiel pour l'arc actif {Fore.LIGHTBLUE_EX}{Pi}{Style.RESET_ALL} - {Fore.LIGHTMAGENTA_EX}{Cj}{Style.RESET_ALL} :")
                     if Pi in potentiels and Cj not in potentiels:
                         potentiels[Cj] = potentiels[Pi] - cout
                         print(f"E({Pi}) - E({Cj}) = {cout}")
@@ -317,6 +338,23 @@ def calcul_potentiels(graph_data):
                         print(f"E({Pi}) - E({Cj}) = {cout}")
                         changes = True
 
+        # Parcourir les arcs ajoutés pour assurer la connexité
+        for supplier_idx, client_idx in added_edges:
+            Pi = f"P{supplier_idx + 1}"
+            Cj = f"C{client_idx + 1}"
+            cout = graph_data['couts'][supplier_idx][client_idx]
+
+            print(f"\nCalcul du potentiel pour l'arc ajouté {Pi} - {Cj} :")
+            # Si un arc ajouté est effectivement connecté et valide
+            if Pi in potentiels and Cj not in potentiels:
+                potentiels[Cj] = potentiels[Pi] - cout
+                print(f"E({Pi}) - E({Cj}) = {cout}")
+                changes = True
+            elif Cj in potentiels and Pi not in potentiels:
+                potentiels[Pi] = cout + potentiels[Cj]
+                print(f"E({Pi}) - E({Cj}) = {cout}")
+                changes = True
+
     print('\nRésultats des potentiels :')
     for key, value in potentiels.items():
         print(f"E({key}) = {value}")
@@ -324,7 +362,14 @@ def calcul_potentiels(graph_data):
     return potentiels
 
 
+# Fonction pour trouver la combinaison minimale qui n'introduit pas de cycle dans le graphe
 def trouver_combinaison_minimale(graph_data, ignore_set):
+    """
+    Trouver la combinaison minimale qui n'introduit pas de cycle dans le graphe.
+    :param graph_data: Dictionnaire contenant les données du graphe
+    :param ignore_set: Ensemble des arêtes à ignorer
+    :return: Tuple (i, j) de la combinaison minimale
+    """
     couts_temp = [row[:] for row in graph_data['couts']]
     n, m = graph_data['taille']
     for i in range(n):
@@ -341,7 +386,6 @@ def trouver_combinaison_minimale(graph_data, ignore_set):
                 min_value = couts_temp[i][j]
                 min_pos = (i, j)
     return min_pos
-
 
 
 # Fonction pour vérifier la connexité du graphe
@@ -480,6 +524,7 @@ def is_marginal_negative(couts_marginaux):
     return min_pos if min_value < 0 else (None, None)
 
 
+# Fonction pour appliquer la méthode de marche pied
 def stepping_stone_method(graph_data, i, j, added_edges):
     """
     Applique la méthode de marche pied pour résoudre le problème de transport.
