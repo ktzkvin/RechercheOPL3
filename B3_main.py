@@ -9,9 +9,9 @@ init(autoreset=True)
 
 
 def is_connex(graph_data, graph_number):
-    print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Connexité du graphe" + Fore.RESET + " ─────────── ✦")
-
+    print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Proposition de transport" + Fore.RESET + " ─────────── ✦")
     display_matrix_transport(graph_data, graph_number)
+    print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Connexité du graphe" + Fore.RESET + " ─────────── ✦")
 
     added_edges = []
     ignored_edges = set()
@@ -23,6 +23,7 @@ def is_connex(graph_data, graph_number):
 
         # Identifier et afficher les sous-graphes connexes
         components = find_connected_components(graph_data)
+
         draw_transport_graph_with_components(graph_data, graph_number, components)
 
         # Trouver les arêtes minimales pour rendre le graphe connexe
@@ -92,7 +93,7 @@ def main_menu(graph_data, graph_number):
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Calcul des coûts marginaux")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "6." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Coûts Totaux")
 
-        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "8. BONUS " + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe (nécessite une proposition de transport)")
+        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "8. BONUS " + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe")
 
         print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "9." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Changer le tableau de contraintes")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
@@ -322,7 +323,6 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
             display_matrix_transport(graph_data, graph_number)
 
-            print(added_edges)
             new_potentiel = calcul_potentiels(graph_data, added_edges)
             couts_potentiel_tab = calcul_couts_potentiels(graph_data, new_potentiel)
             couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
