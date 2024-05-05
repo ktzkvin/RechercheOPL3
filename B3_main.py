@@ -17,9 +17,9 @@ def is_connex(graph_data, graph_number):
     ignored_edges = set()
 
     if bfs_connexity(graph_data):
-        print(f"\nLe réseau de transport est {Back.GREEN}{Fore.LIGHTWHITE_EX}déjà connexe{Style.RESET_ALL}.")
+        print(f"\nLe réseau de transport est {Back.GREEN}{Fore.LIGHTWHITE_EX} déjà connexe {Style.RESET_ALL}.")
     else:
-        print(f"\nLe réseau de transport {Back.RED}{Fore.LIGHTWHITE_EX}n'est pas connexe{Style.RESET_ALL}.")
+        print(f"\nLe réseau de transport {Back.RED}{Fore.LIGHTWHITE_EX} n'est pas connexe {Style.RESET_ALL}.")
 
         # Identifier et afficher les sous-graphes connexes
         components = find_connected_components(graph_data)
@@ -44,7 +44,7 @@ def is_connex(graph_data, graph_number):
                 print(f"Impossible d'ajouter l'arête P{i + 1}-C{j + 1} car cela créerait un cycle : {path}")
                 ignored_edges.add((i, j))
 
-        print("\nLe réseau de transport est maintenant connexe.")
+        print(f"\nLe réseau de transport est maintenant {Back.GREEN}{Fore.LIGHTWHITE_EX} connexe {Style.RESET_ALL}.")
 
     # remettre toutes les propositions de added_edges à 0
     for edge in added_edges:
@@ -292,7 +292,10 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
 
         added_edges = is_connex(graph_data, graph_number)
 
-        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
+        k = 0
+        print(f"\n --------------------------------- Itération : {k} --------------------------------- ")
+
+        print("\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
 
         potentiel = calcul_potentiels(graph_data, added_edges)
         couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
@@ -303,9 +306,10 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
 
         # vérification technique marchepied : vérifier si les coûts marginaux sont négatifs
         i, j = is_marginal_negative(couts_marginaux_tab)
-        k = 0
+
         while i is not None:
-            print(f" --------------------------------- Itération : {k} --------------------------------- ")
+            k += 1
+            print(f"\n --------------------------------- Itération : {k} --------------------------------- \n")
             print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
 
             # revérifier si connexe, si c'est non, relancer is_connex
@@ -318,6 +322,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
             display_matrix_transport(graph_data, graph_number)
 
+            print(added_edges)
             new_potentiel = calcul_potentiels(graph_data, added_edges)
             couts_potentiel_tab = calcul_couts_potentiels(graph_data, new_potentiel)
             couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
@@ -327,12 +332,9 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
 
             i, j = is_marginal_negative(couts_marginaux_tab)
 
-            draw_transport_graph(graph_data, graph_number, added_edges)
-
             # pause pour continuer ou non
             if i is not None and not continue_prompt_marg():
                 break
-            k += 1
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Coûts totaux" + Fore.RESET + " ─────────── ✦")
 

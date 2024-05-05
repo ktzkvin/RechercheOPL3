@@ -545,7 +545,7 @@ def stepping_stone_method(graph_data, i, j, added_edges):
         cycle_path.append(cycle_path[0])
         cycle_path = cycle_path[::-1]
         print("Cycle trouvé pour l'arête donnée : ", end="")
-        print(" -> ".join(cycle_path))
+        print(f"{Back.LIGHTWHITE_EX}{Fore.BLACK} -> ".join(Back.LIGHTWHITE_EX + Fore.BLACK + vertex + Style.RESET_ALL for vertex in cycle_path))
 
     # Créer un tableau pour stocker les arêtes du cycle, exemple : cycle_path = ['P1', 'C1', 'P2', 'C2'], donc cycle = P1 -> C1 -> P2 -> C2, donc array_cycle doit avoir [(P1, C1), (P2, C1), (P2, C2), (P1, C2)] mais avec des indices
     array_cycle = []
