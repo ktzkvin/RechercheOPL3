@@ -239,7 +239,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         added_edges = is_connex(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
-
+        new_potentiels = None
         potentiel = calcul_potentiels(graph_data, added_edges)
         couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
         couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
@@ -259,7 +259,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
             print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Nouvelle proposition de transport" + Fore.RESET + " ─────────── ✦")
             display_matrix_transport(graph_data, graph_number)
 
-            potentiel = calcul_potentiels(graph_data, added_edges)
+            new_potentiel = calcul_potentiels(graph_data, added_edges)
             couts_potentiel_tab = calcul_couts_potentiels(graph_data, potentiel)
             couts_marginaux_tab = calcul_couts_marginaux(graph_data, couts_potentiel_tab)
 
@@ -272,6 +272,8 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
             if (i is not None and not continue_prompt_marg()) or new_potentiel == potentiel:
                 break
             k += 1
+
+            potentiel = new_potentiel
         return added_edges
 
     elif choice == 6:
