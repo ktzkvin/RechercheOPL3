@@ -70,7 +70,7 @@ def continue_prompt():
 # Fonction pour mettre en pause pour les coûts marginaux (demande pour continuer ou non)
 def continue_prompt_marg():
     while True:  # Boucle jusqu'à ce que l'utilisateur donne une réponse valide
-        user_input = input("\n" + Fore.RED + "Un valeur des coûts marginaux a de nouveau été détectée négative, refaire une itération ? "+ Fore.BLUE + "[" + Fore.GREEN + "y" + Fore.LIGHTBLUE_EX + "/" + Fore.RED + "n" + Fore.LIGHTBLUE_EX + "] " + Style.RESET_ALL).lower()
+        user_input = input("\n" + Fore.RED + "Une valeur des coûts marginaux a de nouveau été détectée négative, refaire une itération ? "+ Fore.BLUE + "[" + Fore.GREEN + "y" + Fore.LIGHTBLUE_EX + "/" + Fore.RED + "n" + Fore.LIGHTBLUE_EX + "] " + Style.RESET_ALL).lower()
         if user_input == 'y':
             return True
         elif user_input == 'n':
@@ -269,7 +269,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
             i, j = is_marginal_negative(couts_marginaux_tab)
 
             # pause pour continuer ou non
-            if i is not None and not continue_prompt_marg():
+            if (i is not None and not continue_prompt_marg()) or new_potentiel == potentiel:
                 break
             k += 1
         return added_edges
