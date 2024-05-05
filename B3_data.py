@@ -92,7 +92,7 @@ def display_matrix_transport(graph_data, graph_number):
     # Ajouter la ligne des commandes
     table.append(commandes_row)
 
-    print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
+    print(tabulate(table, headers=headers, tablefmt="grid", numalign="center", stralign="center"))
 
 
 
@@ -128,7 +128,7 @@ def display_matrix_cost_only(taille, couts, provisions, commandes, graph_number)
     # Ajouter la ligne des commandes
     table.append(commandes_row)
 
-    print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
+    print(tabulate(table, headers=headers, tablefmt="grid", numalign="center", stralign="center"))
 
 
 def display_matrix_2d(tableau, graph_number, type_tab):
@@ -148,5 +148,5 @@ def display_matrix_2d(tableau, graph_number, type_tab):
         table.append(row)
 
     print(f"\n Table des coûts {type_tab}:")
-    print(tabulate(table, headers=headers, tablefmt="rounded_grid", numalign="center", stralign="center"))
+    print(tabulate(table, headers=headers, tablefmt="grid", numalign="center", stralign="center"))
 
