@@ -23,7 +23,7 @@ Toutes commandes à suivre sont à exécuter dans le terminal de votre IDE.
 
 #### Clôner le depôt github :
 ```bash
-    [git clone https://github.com/ktzkvin/RechercheOPL3](https://github.com/ktzkvin/RechercheOPL3.git)
+    https://github.com/ktzkvin/RechercheOPL3.git
 ```
 
 #### Naviguer dans le répertoire `RechercheOPL3` :
