@@ -8,29 +8,8 @@ from colorama import Fore, Back, Style, init
 init(autoreset=True)
 
 
-def connexity(graph_data, graph_number):
+def is_connex(graph_data, graph_number):
     print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Connexité du graphe" + Fore.RESET + " ─────────── ✦")
-
-    # Demander à l'utilisateur de choisir l'algorithme
-    print("\nChoisissez l'algorithme à utiliser :")
-    print("1. Algorithme de " + Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
-    print("2. Algorithme de " + Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
-    print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
-    algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
-    method = ""
-
-    # Méthode de Nord-Ouest
-    if algo_choice == 1:
-        graph_data['propositions'] = nord_ouest_method(graph_data)
-        method = "Nord-Ouest"
-
-    # Méthode de Balas-Hammer
-    elif algo_choice == 2:
-        graph_data['propositions'] = balas_hammer_method(graph_data, True)
-        method = "Balas-Hammer"
-
-    print(
-        "\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + f"Affichage des potentiels avec {method}" + Fore.RESET + " ─────────── ✦")
 
     display_matrix_transport(graph_data, graph_number)
 
@@ -112,10 +91,8 @@ def main_menu(graph_data, graph_number):
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "4." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Calcul des coûts potentiels")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "5." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Calcul des coûts marginaux")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "6." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Coûts Totaux")
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "7." + Back.RESET + Fore.RESET + Style.RESET_ALL + " ...")
 
-
-        print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "8. BONUS " + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe (nécessite une proposition de transport)")
+        print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "8. BONUS " + Back.RESET + Fore.RESET + Style.RESET_ALL + " Dessiner le graphe (nécessite une proposition de transport)")
 
         print("\n  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "9." + Back.RESET + Fore.RESET + Style.RESET_ALL + " Changer le tableau de contraintes")
         print("  " + Back.WHITE + Fore.BLACK + Style.BRIGHT + "0." + Back.RESET + Style.RESET_ALL + Fore.RED + "  Quitter")
@@ -194,11 +171,43 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         display_matrix_transport(graph_data, graph_number)
 
     elif choice == 3:
-        added_edges = connexity(graph_data, graph_number)
+
+        # Demander à l'utilisateur de choisir l'algorithme
+        print("\nChoisissez l'algorithme à utiliser :")
+        print("1. Algorithme de " + Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
+        print("2. Algorithme de " + Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
+        print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
+        algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
+
+        # Méthode de Nord-Ouest
+        if algo_choice == 1:
+            graph_data['propositions'] = nord_ouest_method(graph_data)
+
+        # Méthode de Balas-Hammer
+        elif algo_choice == 2:
+            graph_data['propositions'] = balas_hammer_method(graph_data, True)
+
+        added_edges = is_connex(graph_data, graph_number)
         return added_edges
 
     elif choice == 4:
-        added_edges = connexity(graph_data, graph_number)
+
+        # Demander à l'utilisateur de choisir l'algorithme
+        print("\nChoisissez l'algorithme à utiliser :")
+        print("1. Algorithme de " + Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
+        print("2. Algorithme de " + Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
+        print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
+        algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
+
+        # Méthode de Nord-Ouest
+        if algo_choice == 1:
+            graph_data['propositions'] = nord_ouest_method(graph_data)
+
+        # Méthode de Balas-Hammer
+        elif algo_choice == 2:
+            graph_data['propositions'] = balas_hammer_method(graph_data, True)
+
+        added_edges = is_connex(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts potentiels" + Fore.RESET + " ─────────── ✦")
 
@@ -210,7 +219,23 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         return added_edges
 
     elif choice == 5:
-        added_edges = connexity(graph_data, graph_number)
+
+        # Demander à l'utilisateur de choisir l'algorithme
+        print("\nChoisissez l'algorithme à utiliser :")
+        print("1. Algorithme de " + Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
+        print("2. Algorithme de " + Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
+        print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
+        algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
+
+        # Méthode de Nord-Ouest
+        if algo_choice == 1:
+            graph_data['propositions'] = nord_ouest_method(graph_data)
+
+        # Méthode de Balas-Hammer
+        elif algo_choice == 2:
+            graph_data['propositions'] = balas_hammer_method(graph_data, True)
+
+        added_edges = is_connex(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
 
@@ -249,8 +274,23 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         return added_edges
 
     elif choice == 6:
-        added_edges = connexity(graph_data, graph_number)
-        draw_transport_graph(graph_data, graph_number, added_edges)
+
+        # Demander à l'utilisateur de choisir l'algorithme
+        print("\nChoisissez l'algorithme à utiliser :")
+        print("1. Algorithme de " + Fore.LIGHTWHITE_EX + Back.GREEN + " Nord-Ouest " + Style.RESET_ALL)
+        print("2. Algorithme de " + Fore.LIGHTWHITE_EX + Back.BLUE + " Balas-Hammer " + Style.RESET_ALL)
+        print(Fore.LIGHTBLUE_EX + "\n┌─────────────────────")
+        algo_choice = int(input(Fore.LIGHTBLUE_EX + "█ Entrez votre choix : " + Style.RESET_ALL))
+
+        # Méthode de Nord-Ouest
+        if algo_choice == 1:
+            graph_data['propositions'] = nord_ouest_method(graph_data)
+
+        # Méthode de Balas-Hammer
+        elif algo_choice == 2:
+            graph_data['propositions'] = balas_hammer_method(graph_data, True)
+
+        added_edges = is_connex(graph_data, graph_number)
 
         print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Calcul des coûts marginaux" + Fore.RESET + " ─────────── ✦")
 
@@ -267,6 +307,10 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         while i is not None:
             print(f" --------------------------------- Itération : {k} --------------------------------- ")
             print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
+
+            # revérifier si connexe, si c'est non, relancer is_connex
+            if not bfs_connexity(graph_data):
+                added_edges = is_connex(graph_data, graph_number)
 
             graph_data['propositions'] = stepping_stone_method(graph_data, i, j, added_edges)
 

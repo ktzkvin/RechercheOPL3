@@ -320,23 +320,26 @@ def calcul_potentiels(graph_data, added_edges):
     while changes:
         changes = False
 
-        # Parcourir tous les arcs actifs (propositions > 0)
-        for i, row in enumerate(graph_data['couts']):
-            for j, cout in enumerate(row):
-                Pi = f"P{i + 1}"
-                Cj = f"C{j + 1}"
-                proposition = graph_data['propositions'][i][j]
+        # Parcourir 2 fois pour s'assurer qu'on oublie aucun potentiel
+        for p in range(0, 2):
+            # Parcourir tous les arcs actifs (propositions > 0)
+            for i, row in enumerate(graph_data['couts']):
+                for j, cout in enumerate(row):
+                    Pi = f"P{i + 1}"
+                    Cj = f"C{j + 1}"
+                    proposition = graph_data['propositions'][i][j]
 
-                if proposition > 0:  # Arc actif uniquement
-                    print(f"\nCalcul du potentiel pour l'arc actif {Fore.LIGHTBLUE_EX}{Pi}{Style.RESET_ALL} - {Fore.LIGHTMAGENTA_EX}{Cj}{Style.RESET_ALL} :")
-                    if Pi in potentiels and Cj not in potentiels:
-                        potentiels[Cj] = potentiels[Pi] - cout
-                        print(f"E({Pi}) - E({Cj}) = {cout}")
-                        changes = True
-                    elif Cj in potentiels and Pi not in potentiels:
-                        potentiels[Pi] = cout + potentiels[Cj]
-                        print(f"E({Pi}) - E({Cj}) = {cout}")
-                        changes = True
+                    if proposition > 0:  # Arc actif uniquement
+
+                        if Pi in potentiels and Cj not in potentiels:
+                            potentiels[Cj] = potentiels[Pi] - cout
+                            print(f"E({Pi}) - E({Cj}) = {cout}")
+                            changes = True
+                        elif Cj in potentiels and Pi not in potentiels:
+                            potentiels[Pi] = cout + potentiels[Cj]
+                            print(f"E({Pi}) - E({Cj}) = {cout}")
+                            changes = True
+            p += 1
 
         # Parcourir les arcs ajoutés pour assurer la connexité
         for supplier_idx, client_idx in added_edges:
@@ -344,7 +347,6 @@ def calcul_potentiels(graph_data, added_edges):
             Cj = f"C{client_idx + 1}"
             cout = graph_data['couts'][supplier_idx][client_idx]
 
-            print(f"\nCalcul du potentiel pour l'arc ajouté {Pi} - {Cj} :")
             # Si un arc ajouté est effectivement connecté et valide
             if Pi in potentiels and Cj not in potentiels:
                 potentiels[Cj] = potentiels[Pi] - cout
@@ -420,7 +422,6 @@ def detect_cycle_with_edge(graph_data, edge, added_edges=None):
     :param edge: Sommets de l'arête à vérifier
     :return: True si un cycle est créé, False sinon
     """
-    print(added_edges)
     # Initialisation
     total_vertices = sum(graph_data['taille'])
     visited = [False] * total_vertices
