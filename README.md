@@ -23,7 +23,7 @@ Toutes commandes à suivre sont à exécuter dans le terminal de votre IDE.
 
 #### Clôner le depôt github :
 ```bash
-    git clone https://github.com/ktzkvin/RechercheOPL3
+    [git clone https://github.com/ktzkvin/RechercheOPL3](https://github.com/ktzkvin/RechercheOPL3.git)
 ```
 
 #### Naviguer dans le répertoire `RechercheOPL3` :
@@ -49,21 +49,23 @@ Ou bien exécuter le fichier B3_main.py à l'aide de votre IDE.
 Le programme lit un tableau de contraintes à partir d'un fichier texte et stocke les informations en **mémoire**.<br />
 Puis, un **menu** est affiché pour choisir une fonctionnalité à lancer sur le tableau de contraintes.
 
-### 1. Affichage du Tableau de Contraintes
-Le graphe mémorisé est généré sous forme de **tableau**, y compris les sommets fictifs 0 (α) et N+1 (ω).<br />
-De même, le graphe est affiché sous forme de **triplets** pour une meilleure compréhension.
+### 1. Matrice des coûts
+Le graphe mémorisé est généré sous forme de **tableau**.<br />
 
-### 2. Affichage Matriciel
-Le graphe mémorisé est généré sous forme **matricielle**, y compris les sommets fictifs 0 (α) et N+1 (ω).
+### 2. Proposition de transport (NO/BH)
+Possibilité de générer une nouvelle proposition de transport avec Nord-Ouest ou Ballas-Hammer.
 
-### 3.1 Vérification des Propriétés du Graphe
-Le graphe est examiné pour s'assurer que toutes les valeurs d'arc sont positives et qu'il ne contient pas de circuit.
+### 4. Calcul des coûts potentiels
+Calculer les coûts potentiels détaillés avec l'algorithme de Nord-Ouest ou celui de Ballas-Hammer.
 
-### 3.2 Calcul des calendriers
-Pour calculer les calendriers, l'algorithme aura d'abord besoin de **calculer les rangs** :
+### 5. Calcul des coûts marginaux
+Calculer les coûts marginaux détaillés avec l'algorithme de Nord-Ouest ou celui de Ballas-Hammer.
 
-### 4. BONUS : Affichage du graphe
+### 6. Calcul des coûts totaux
+Calculer les coûts totaux détaillés avec l'algorithme de Nord-Ouest ou celui de Ballas-Hammer.
+
+### 8. BONUS : Affichage du graphe
 Ne faisant par partie du cahier des charges du sujet, nous avons décidé d'importer un affichage graphique afin d'avoir une meilleure compréhension visuelle du graphe.
 
-### 5. Changer la table de contraintes
+### 9. Changer la table de contraintes
 Pour éviter toute interruption du code, il est également possible de choisir une nouvelle table de contraintes à étudier.
