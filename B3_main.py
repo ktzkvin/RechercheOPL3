@@ -38,7 +38,7 @@ def is_connex(graph_data, graph_number):
             if not is_cycle:
                 graph_data['propositions'][i][j] += 1
                 added_edges.append((i, j))
-                print(f"L'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j + 1}{Style.RESET_ALL} a été ajoutée pour améliorer la connexité.")
+                print(f"L'arête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j + 1}{Style.RESET_ALL} a été ajoutée pour améliorer la connexité.")
 
             else:
                 # Associer chaque tuple de path à un sommet
@@ -252,7 +252,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         k = 0
         while i is not None:
             print(f" --------------------------------- Itération : {k} --------------------------------- ")
-            print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
+            print(f"Le coût marginal de l'arête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j+1}{Style.RESET_ALL} est négatif.")
             graph_data['propositions'] = stepping_stone_method(graph_data, i, j, added_edges)
 
             # Afficher le tableau de nouvelle proposition de transport
@@ -314,7 +314,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         while i is not None:
             k += 1
             print(f"\n --------------------------------- Itération : {k} --------------------------------- \n")
-            print(f"Le coût marginal de l'arrête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j + 1}{Style.RESET_ALL} est négatif.")
+            print(f"Le coût marginal de l'arête {Fore.LIGHTBLUE_EX}P{i + 1}{Style.RESET_ALL}-{Fore.LIGHTMAGENTA_EX}C{j + 1}{Style.RESET_ALL} est négatif.")
 
             # revérifier si connexe, si c'est non, relancer is_connex
             if not bfs_connexity(graph_data):
