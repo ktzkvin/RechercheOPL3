@@ -30,6 +30,12 @@ def create_random_matrix(n, m):
 
 
 def mesure_temps_execution(algo, graph_data):
+    """
+    Mesure le temps d'exécution d'un algorithme pour un ensemble de données donné.
+    :param algo:
+    :param graph_data:
+    :return:
+    """
     start_time = time.perf_counter()
     algo(graph_data)
     end_time = time.perf_counter()
@@ -37,6 +43,10 @@ def mesure_temps_execution(algo, graph_data):
 
 
 def complex_analys():
+    """
+    Analyse de la complexité des algorithmes de transport.
+    :return:
+    """
     # Tailles de problème à tester
     sizes = [10, 30, 100]
     repetitions = 100  # Nombre de répétitions pour chaque taille

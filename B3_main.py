@@ -9,6 +9,12 @@ init(autoreset=True)
 
 
 def is_connex(graph_data, graph_number):
+    """
+    Vérifie si le graphe est connexe et propose des arêtes pour le rendre connexe.
+    :param graph_data:
+    :param graph_number:
+    :return:
+    """
     print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Proposition de transport" + Fore.RESET + " ─────────── ✦")
     display_matrix_transport(graph_data, graph_number)
     print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Connexité du graphe" + Fore.RESET + " ─────────── ✦")
@@ -169,6 +175,7 @@ def execute_choice(choice, graph_data, graph_number, added_edges):
         else:
             print("Choix invalide. Veuillez entrer 1 ou 2 pour sélectionner l'algorithme.")
 
+        print("\n\n✦ ─────────── " + Fore.LIGHTWHITE_EX + "Proposition de transport" + Fore.RESET + " ─────────── ✦")
         display_matrix_transport(graph_data, graph_number)
 
     elif choice == 3:
